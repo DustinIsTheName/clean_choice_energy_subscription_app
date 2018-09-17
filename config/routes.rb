@@ -10,4 +10,8 @@ Rails.application.routes.draw do
     get 'users' => :users
   end
 
+  controller :processes do
+    post 'import' => :import
+  end
+
 end
