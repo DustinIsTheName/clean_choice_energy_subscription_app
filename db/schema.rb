@@ -10,11 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180917152939) do
+ActiveRecord::Schema.define(version: 20180919211134) do
 
   create_table "events", force: :cascade do |t|
     t.string   "name"
-    t.string   "type"
+    t.string   "event_type"
     t.text     "event_lines"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
@@ -32,7 +32,7 @@ ActiveRecord::Schema.define(version: 20180917152939) do
     t.text     "address"
     t.integer  "cc_number"
     t.string   "expiration"
-    t.integer  "external_id",     limit: 8
+    t.string   "external_id"
     t.integer  "product",         limit: 8
     t.integer  "payment_service"
     t.datetime "created_at",                null: false
