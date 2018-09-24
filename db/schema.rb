@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180919211134) do
+ActiveRecord::Schema.define(version: 20180922191919) do
 
   create_table "events", force: :cascade do |t|
     t.string   "name"
@@ -18,11 +18,13 @@ ActiveRecord::Schema.define(version: 20180919211134) do
     t.text     "event_lines"
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
+    t.string   "user_id"
   end
 
   create_table "imports", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+    t.integer  "transaction_count"
   end
 
   create_table "subscriptions", force: :cascade do |t|
@@ -30,13 +32,14 @@ ActiveRecord::Schema.define(version: 20180919211134) do
     t.string   "last_name"
     t.string   "email"
     t.text     "address"
-    t.integer  "cc_number"
+    t.string   "cc_number"
     t.string   "expiration"
     t.string   "external_id"
-    t.integer  "product",         limit: 8
+    t.integer  "product",              limit: 8
     t.integer  "payment_service"
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.string   "external_customer_id"
   end
 
   create_table "transactions", force: :cascade do |t|
@@ -44,12 +47,28 @@ ActiveRecord::Schema.define(version: 20180919211134) do
     t.string   "email"
     t.integer  "product",     limit: 8
     t.integer  "amount"
-    t.integer  "cc_number"
+    t.string   "cc_number"
     t.boolean  "status"
     t.text     "error_codes"
     t.integer  "import_id"
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
+    t.boolean  "no_retry"
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string   "email",                  default: "", null: false
+    t.string   "encrypted_password",     default: "", null: false
+    t.string   "access"
+    t.string   "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.string   "first_name"
+    t.string   "last_name"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
 end

@@ -12,42 +12,26 @@ class ProcessesController < ApplicationController
     csv_text = File.read(params["CsvDoc"].path)
     csv = CSV.parse(csv_text, :headers => true)
 
+    Import.destroy_all
+    Transaction.destroy_all
+
     import = Import.new
+    import.transaction_count = csv.count
     import.save
 
     csv.each do |row|
+      row = row.to_hash
+
+      puts row["First Name"]
+      puts row["Last Name"]
+      puts row["Credit Card #"]
+      puts row["Credit Card #"].to_s.slice(-4,4)
+
       transaction = Transaction.new
-      subscription = Subscription.new
+      subscription = Subscription.find_by({first_name: row["First Name"]&.strip, last_name: row["Last Name"]&.strip, cc_number: row["Credit Card #"].to_s.strip.slice(-4,4)})
       error_codes = []
 
-      row = row.to_hash
-      
-      ################################################################################
-      # Create Stripe token and Customer - Stripe
-      ################################################################################
-      begin
-        expiration = row["Credit Card Expiration (MM/YY)"].split('/')
-        token = Stripe::Token.create(
-          :card => {
-            :number => row["Credit Card #"],
-            :exp_month => expiration[0],
-            :exp_year => expiration[1]
-          },
-        )
-
-        customer = Stripe::Customer.create(
-          :description => "Customer for jenny.rosen@example.com",
-          :source => token
-        )
-      rescue => e
-        error_codes << e.message
-        puts Colorize.orange('Stripe Error')
-        puts e.message
-      end
-
-      ################################################################################
-      # Use the provided ID to get the product from Shopify. - Shopify
-      ################################################################################
+      transaction.no_retry = false
       unless row["Subscription Product"].blank?
         begin
           product = ShopifyAPI::Product.find(row["Subscription Product"])
@@ -56,27 +40,203 @@ class ProcessesController < ApplicationController
         end
       end
 
-      ################################################################################
-      # Create Stripe Charge using the created Customer. - Stripe
-      ################################################################################
-      if token and product
-        plan = Stripe::Plan.create(
-          :amount => (product.variants.first.price.to_f * 100).floor,
-          :interval => "month",
-          :product => {
-            :name => product.title
-          },
-          :currency => "usd"
-        )
+      puts subscription
 
-        stripe_subscription = Stripe::Subscription.create(
-          :customer => customer.id,
-          :items => [
-            {
-              :plan => plan.id,
-            },
-          ]
-        )
+      unless subscription
+        subscription = Subscription.new
+        ################################################################################
+        # Use the provided ID to get the product from Shopify. - Shopify
+        ################################################################################
+
+        if row["Email"].blank?
+          ################################################################################
+          # Create Stripe token and Customer - Stripe
+          ################################################################################
+          begin
+            expiration = row["Credit Card Expiration (MM/YY)"].split('/')
+            stripe_token = Stripe::Token.create(
+              :card => {
+                :number => row["Credit Card #"],
+                :exp_month => expiration[0],
+                :exp_year => expiration[1]
+              },
+            )
+
+            stripe_customer = Stripe::Customer.create(
+              :description => "Customer for jenny.rosen@example.com",
+              :source => stripe_token
+            )
+          rescue => e
+            error_codes << e.message
+            puts Colorize.orange('Stripe Error')
+            puts e.message
+          end
+
+          ################################################################################
+          # Create Stripe Charge using the created Customer. - Stripe
+          ################################################################################
+          if stripe_token and product
+            stripe_plan = Stripe::Plan.create(
+              :amount => (product.variants.first.price.to_f * 100).floor,
+              :interval => "month",
+              :product => {
+                :name => product.title
+              },
+              :currency => "usd"
+            )
+
+            stripe_subscription = Stripe::Subscription.create(
+              :customer => stripe_customer.id,
+              :items => [
+                {
+                  :plan => stripe_plan.id,
+                },
+              ]
+            )
+          end
+        else # row["Email"].blank?
+          ################################################################################
+          # Create ReCharge Customer and Address. - ReCharge
+          ################################################################################
+          begin
+            ########### recharge_customer
+            url = URI("https://api.rechargeapps.com/customers")
+
+            address2 = row["Street Address 2"] ||= ""
+
+            customer_params = {
+              "email": row["Email"],
+              "first_name": row["First Name"]&.strip,
+              "last_name": row["Last Name"]&.strip,
+              "billing_first_name": row["First Name"],
+              "billing_last_name": row["Last Name"],
+              "billing_address1": row["Street Address"],
+              "billing_address2": address2,
+              "billing_zip": row["Zip"],
+              "billing_city": row["City"],
+              "billing_province": row["State"],
+              "billing_country": "United States",
+              "billing_phone": "1-800-555-1234"
+            }
+
+            recharge_customer = recharge_http_request(url, customer_params)
+
+            puts Colorize.bright('recharge_customer')
+            puts Colorize.bright(recharge_customer)
+
+            ########### recharge_address
+            if recharge_customer["customer"]
+              url = URI("https://api.rechargeapps.com/customers/#{recharge_customer["customer"]["id"]}/addresses")
+
+              address_params = {
+                "address1": row["Street Address"],
+                "address2": address2,
+                "city": row["City"],
+                "province": row["State"],
+                "first_name": recharge_customer["customer"]["first_name"]&.strip,
+                "last_name": recharge_customer["customer"]["last_name"]&.strip,
+                "zip": row["Zip"],
+                "country": "United States",
+                "phone": "1-800-555-1234"
+              }
+            elsif recharge_customer["errors"]
+              recharge_customer["errors"].each do |error_message|
+                error_codes << error_message.last
+              end
+            end
+
+            recharge_address = recharge_http_request(url, address_params)
+
+            if recharge_address["errors"]
+              recharge_address["errors"].each do |error_message|
+                error_codes << error_message.last
+              end
+            end
+
+            puts Colorize.bright('recharge_address')
+            puts Colorize.bright(recharge_address)
+          rescue => e
+            error_codes << e.message
+            puts Colorize.orange('ReCharge Error - Customer and Address')
+            puts e.message
+          end
+
+          ################################################################################
+          # Create Stripe token and Customer to pass to ReCharge - Stripe
+          ################################################################################
+          begin
+            if row["Credit Card Expiration (MM/YY)"]
+              expiration = row["Credit Card Expiration (MM/YY)"].split('/')
+              stripe_token = Stripe::Token.create(
+                :card => {
+                  :number => row["Credit Card #"],
+                  :exp_month => expiration[0],
+                  :exp_year => expiration[1]
+                },
+              )
+
+              stripe_customer = Stripe::Customer.create(
+                :description => "Customer for jenny.rosen@example.com",
+                :source => stripe_token
+              )
+            else
+              error_codes << "Credit Card Expiration can't be blank"
+            end
+          rescue => e
+            error_codes << e.message
+            puts Colorize.orange('Stripe Error for ReCharge')
+            puts e.message
+          end
+
+          ################################################################################
+          # Create ReCharge Subscription with created Customer and Address and Stripe token. - ReCharge
+          ################################################################################
+
+          begin
+            if stripe_customer and recharge_address["address"] and product
+
+              url = URI("https://api.rechargeapps.com/subscriptions")
+
+              current_time = Time.now
+              if current_time.mday > 28
+                current_time = current_time.at_beginning_of_month.next_month
+              end
+
+              subscription_params = {
+                "address_id": recharge_address["address"]["id"],
+                "next_charge_scheduled_at": (current_time + 600).strftime('%Y-%m-%dT%H:%M:%S'),
+                "product_title": product.title,
+                "price": product.variants.first.price,
+                "quantity": 1,
+                "shopify_variant_id": product.variants.first.id,
+                "order_interval_unit": "month",
+                "order_interval_frequency": "1",
+                "order_day_of_month": current_time.mday,
+                "charge_interval_frequency": "1",
+                "stripe_customer_token": stripe_customer.id
+              }
+
+              recharge_subscription = recharge_http_request(url, subscription_params)
+
+              if recharge_subscription["errors"]
+                recharge_subscription["errors"].each do |error_message|
+                  error_codes << error_message.last
+                end
+              end
+
+              puts Colorize.bright('recharge_subscription')
+              puts Colorize.bright(recharge_subscription)
+            end
+          rescue => e
+            error_codes << e.message
+            puts Colorize.orange('ReCharge Error - Subscription')
+            puts e.message
+          end
+
+        end # row["Email"].blank?
+      else
+        error_codes << "Customer already has subscription"
+        transaction.no_retry = true
       end
 
       ################################################################################
@@ -89,7 +249,7 @@ class ProcessesController < ApplicationController
           transaction.name = row["First Name"].strip
           subscription.first_name = row["First Name"].strip
         else
-          error_codes << "First Name Blank"
+          error_codes << "First Name can't be blank"
         end
         unless row["First Name"].blank? or row["Last Name"].blank?
           transaction.name += ' '
@@ -98,7 +258,7 @@ class ProcessesController < ApplicationController
           transaction.name += row["Last Name"].strip
           subscription.last_name = row["Last Name"].strip
         else
-          error_codes << "Last Name Blank"
+          error_codes << "Last Name can't be blank"
         end
       end
 
@@ -124,13 +284,29 @@ class ProcessesController < ApplicationController
         error_codes << "No credit card number"
       end
 
-      ######### Status
-      transaction.status = 1
       ######### Import Relation
       transaction.import_id = import.id
 
+      if stripe_customer
+        subscription.external_customer_id = stripe_customer.id
+      elsif recharge_customer
+        if recharge_customer["customer"]
+          subscription.external_customer_id = recharge_customer["customer"]["id"]
+        end
+      end
+
       if stripe_subscription
         subscription.external_id = stripe_subscription.id
+        subscription.payment_service = 'stripe'
+      elsif recharge_subscription
+        if recharge_subscription["subscription"]
+          subscription.external_id = recharge_subscription["subscription"]["id"]
+          subscription.payment_service = 'recharge'
+        elsif recharge_subscription["errors"]
+          recharge_subscription["errors"].each do |error_message|
+            error_codes << error_message.first.to_s + ' ' + error_message.last
+          end
+        end
       end
 
       ################################################################################
@@ -160,15 +336,27 @@ class ProcessesController < ApplicationController
       end
 
       ################################################################################
-      # Save the Subscription and recored errors if they fail. - Subscription
+      # Check Error Codes
       ################################################################################
-      if subscription.save
-        puts Colorize.green('subscription saved')
+      if error_codes.size > 0
+        transaction.status = false
+        puts Colorize.red('errors present, so skip saving subscription')
       else
-        subscription.errors.messages.each do |error_message|
-          error_codes << (error_message.first.to_s << ' ' << error_message.last.first)
+        ################################################################################
+        # Save the Subscription and recored errors if they fail. - Subscription/Transaction
+        ################################################################################
+        if subscription.save
+          ######### Set Transaction Status
+          transaction.status = true
+          puts Colorize.green('subscription saved')
+        else
+          ######### Set Transaction Status
+          transaction.status = false
+          subscription.errors.messages.each do |error_message|
+            error_codes << (error_message.first.to_s << ' ' << error_message.last.first)
+          end
+          puts Colorize.red('subscription error')
         end
-        puts Colorize.red('subscription error')
       end
 
       ################################################################################
@@ -199,10 +387,38 @@ class ProcessesController < ApplicationController
     event.name = "Import: Batch # #{import.id}"
     event.event_type = "import"
     event.event_lines = event_lines
+    event.user_id = current_user.id
 
     event.save
 
     render json: import, :include => [:transactions]
   end
+
+  private
+
+    def recharge_http_request(url, body = nil)
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+      if body
+        request = Net::HTTP::Post.new(url)
+      else
+        request = Net::HTTP::Get.new(url)
+      end
+      request["x-recharge-access-token"] = ENV['RECHARGE_API_KEY']
+      request["content-type"] = 'application/json'
+
+      if body
+        request.body = body.to_json
+      end
+
+      response = http.request(request)
+
+      puts Colorize.yellow(request.body)
+      puts Colorize.yellow(response.code)
+
+      JSON.parse response.read_body
+    end
 
 end

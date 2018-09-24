@@ -1,1 +1,82 @@
 <input id="csv_import_file" type="file">
+
+<div class="page-content import-page" data-empty-transaction-row="<%= empty_transaction_row.gsub("\n", " ") %>">
+  <div class="container">
+    <div class="page-title">Import</div>
+    <div class="add-container clearfix">
+      <div class="align-left">
+        <div class="align-left">
+          <div class="add-title">Upload CSV File</div>
+          <div class="file-message">File must end in .csv <a href="">(template)</a></div>
+        </div>
+        <button class="secondary choose-file">Choose File</button>
+      </div><!-- .align-left -->
+      <div class="align-right">
+        <div class="file-name align-left" style="display:none;">new-subscribers.csv <span class="remove-file">X</span></div>
+        <button class="import-button disabled" disabled>Import</button>
+      </div><!-- .align-right -->
+    </div><!-- .add-container -->
+  </div><!-- .container -->
+  <hr/>
+  <div class="import-results-container"<% unless @import %> style="display:none;"<% end %>>
+    <% if @import %>
+      <% successful_transactions = @import.transactions.select{|t| t.status} %>
+      <% failed_transactions = @import.transactions.select{|t| !t.status} %>
+    <% end %>
+    <div class="container clearfix">
+      <div class="importing-container clearfix">
+        <div class="section-title importing"><% if @import %>Imported <%= @import.transaction_count %> subscription orders<% end %></div>
+        <div class="progress-bar">
+          <% if @import %>
+            <% progress_percent = (@import.transactions.count / @import.transaction_count.to_f * 100.0) %>
+            <div class="progress" style="width: <%= progress_percent %>%;"><%= progress_percent.floor %>%</div>
+          <% end %>
+        </div>
+      </div>
+      <div class="section-title batch-number"><% if @import %>Batch <%= @import.id %><% end %></div>
+      <div class="align-left" <% unless @import and failed_transactions.count > 0 %> style="display:none;"<% end %>>
+        <div class="section-title-small">Failed Transactions</div>
+        <div class="transaction-stats align-left">
+          <% if failed_transactions %>
+          <div class="transaction-qty"><%= failed_transactions.count %> of <%= @import.transaction_count %></div>
+          <div class="transaction-sales trans-failed"><%= money failed_transactions.map{ |t| t.amount }.compact.sum %></div>
+          <% end %>
+        </div><!-- .transaction-stats -->
+      </div><!-- .align-left -->
+      <!-- <button class="align-right retry-all"<% unless @import and failed_transactions.count > 0 %> style="display:none;"<% end %>>Retry All Failed Orders</button> -->
+    </div><!-- .container -->
+    <div class="container"<% unless @import and failed_transactions.count > 0 %> style="display:none;"<% end %>>
+      <div class="subscriptions subs-failed clearfix">
+        <%= render partial: '/partials/transaction_header' %>
+        <% if failed_transactions %>
+          <% for transaction in failed_transactions %>
+            <%= render partial: '/partials/transaction_row', locals: {transaction: transaction} %>
+          <% end %>
+        <% end %>
+      </div><!-- subscriptions -->
+    </div><!-- .container -->
+    <div class="container clearfix"<% unless @import and successful_transactions.count > 0 %> style="display:none;"<% end %>>
+      <div class="align-left">
+        <div class="section-title-small">Successful Transactions</div>
+        <div class="transaction-stats align-left">
+          <% if successful_transactions %>
+          <div class="transaction-qty"><%= successful_transactions.count %> of <%= @import.transaction_count %></div>
+          <div class="transaction-sales"><%= money successful_transactions.map{ |t| t.amount }.compact.sum %></div>
+          <% end %>
+        </div><!-- .transaction-stats -->
+      </div><!-- .align-left -->
+    </div><!-- .container -->
+    <div class="container"<% unless @import and successful_transactions.count > 0 %> style="display:none;"<% end %>>
+      <div class="subscriptions subs-success clearfix">
+        <%= render partial: '/partials/transaction_header' %>
+
+        <% if successful_transactions %>
+          <% for transaction in successful_transactions %>
+            <%= render partial: '/partials/transaction_row', locals: {transaction: transaction} %>
+          <% end %>
+        <% end %>
+
+      </div><!-- subscriptions -->
+    </div><!-- .container -->
+  </div>
+</div><!-- .page-content -->

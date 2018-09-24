@@ -1,3 +1,658 @@
-// Place all the styles related to the pages controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
+/***** GENERAL *****/
+
+* {
+  transition: color .2s, background .2s, opacity .2s;
+}
+body {
+  background: #F0F0F0;
+  color: #323232;
+  font-size: 15px;
+  font-family: museo-sans, sans-serif;
+  font-weight: 300;
+  padding-bottom: 50px;
+}
+a { 
+  color: #64A75A;
+  font-weight: 500;
+  text-decoration: none;
+}
+a:hover {
+  color: #83b97b;
+}
+input {
+  display: block;
+  width: 100%;
+  padding: 13px 25px;
+  margin-bottom: 10px;
+  border: #3F94D3 solid 1px;
+  border-radius: 4px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1;
+  -webkit-appearance: none;
+}
+input::placeholder {
+  color: #A1AAAA;
+}
+button, .btn {
+  padding: 10px 25px;
+  border: #64A75A solid 2px;
+  border-radius: 4px;
+  background: #64A75A;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  -webkit-appearance: none;
+}
+button.disabled, .btn.disabled {
+  background: #d8d8d8;
+  border-color: #d8d8d8;
+}
+button:hover, .btn:hover {
+  background: #83b97b;
+  border-color: #83b97b;
+  cursor: pointer;
+}
+button.disabled:hover, .btn.disabled:hover {
+  background: #d8d8d8;
+  border-color: #d8d8d8;
+}
+button.secondary, .btn.secondary {
+  border: #3F94D3 solid 2px;
+  background: #fff;
+  color: #3F94D3;
+}
+button.secondary.disabled, .btn.secondary.disabled {
+  border-color: #d8d8d8;
+  color: #d8d8d8;
+}
+button.secondary:hover, .btn.secondary:hover {
+  opacity: .7;
+}
+button.secondary.disabled:hover, .btn.secondary.disabled:hover {
+  background: #fff;
+  border-color: #d8d8d8;
+  color: #d8d8d8;
+  opacity: 1;
+}
+.container {
+  width: 1180px;
+  margin: 0 auto;
+}
+.align-left {
+  float: left;
+}
+.align-right {
+  float: right;
+}
+.clearfix::after {
+    display: block;
+    content: "";
+    clear: both;
+}
+hr {
+  background: #D8D8D8;
+  height: 2px;
+  border: none;
+  margin: 50px 0;
+}
+.page-title-container {
+  height: 136px;
+  position: relative;
+}
+.page-title, .section-title {
+  font-size: 32px;
+  color: #323232;
+  margin: 50px 0;
+  font-weight: 700;
+}
+.add-container {
+  background: #fff;
+  padding: 50px;
+}
+.add-title {
+  text-transform: uppercase;
+  color: #5F615F;
+  font-size: 17px;
+  font-weight: 700;
+}
+.section-title {
+  margin: 0;
+}
+.section-title-small {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.subscriptions {
+  width: 100%;
+  margin-top: 15px;
+  font-weight: 500;
+}
+.subscriptions.subs-failed {
+  margin-bottom: 50px;
+}
+.subs-row { 
+  border-bottom: #d8d8d8 solid 1px;
+}
+.subscriptions .subs-row:nth-child(2n) {
+  background: #fff;
+}
+.subscriptions .subs-row:nth-child(2n+1) {
+  background: #f5f5f5;
+}
+.subscriptions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+} 
+.subscriptions li {
+  border: none;
+  display: inline;
+  float: left;
+}
+.subscriptions .subs-header li {
+  background: #283745 !important;
+  color: #fff;
+  display: block;
+}
+.subscriptions li { 
+  width: calc(95% / 6);
+  padding: 21px 0 19px;
+  text-align: center;
+}
+.subscriptions li:first-child {
+  width: 5%;
+}
+
+/***** END GENERAL *****/
+
+
+/***** FONTS *****/
+
+@font-face {
+    font-family: museo-sans;
+    src: url('assets/fonts/MuseoSans-300.eot');
+    src: url('assets/fonts/MuseoSans-300.eot?#iefix') format('embedded-opentype'),
+        url('assets/fonts/MuseoSans-300.woff2') format('woff2'),
+        url('assets/fonts/MuseoSans-300.woff') format('woff'),
+        url('assets/fonts/MuseoSans-300.ttf') format('truetype');
+    font-weight: 300;
+    font-style: normal;
+}
+@font-face {
+    font-family: museo-sans;
+    src: url('assets/fonts/MuseoSans-500.eot');
+    src: url('assets/fonts/MuseoSans-500.eot?#iefix') format('embedded-opentype'),
+        url('assets/fonts/MuseoSans-500.woff2') format('woff2'),
+        url('assets/fonts/MuseoSans-500.woff') format('woff'),
+        url('assets/fonts/MuseoSans-500.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: museo-sans;
+    src: url('assets/fonts/MuseoSans-700.eot');
+    src: url('assets/fonts/MuseoSans-700.eot?#iefix') format('embedded-opentype'),
+        url('assets/fonts/MuseoSans-700.woff2') format('woff2'),
+        url('assets/fonts/MuseoSans-700.woff') format('woff'),
+        url('assets/fonts/MuseoSans-700.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+/***** END FONTS *****/
+
+
+/***** HEADER *****/
+
+header {
+  height: 100px;
+  border: #D8D8D8 solid 1px;
+  background: #fff;
+}
+header .container {
+  height: 50px;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.header-logo {
+  height: 50px;
+  width: 198px;
+    display: inline;
+    float: left;
+}
+.header-logo img {
+  max-width: 198px;
+}
+
+.header-nav {
+  float: left;
+  margin-left: 50px;
+}
+.header-nav ul {
+  list-style: none;
+  font-size: 17px;
+  font-weight: 700;
+}
+.header-nav li {
+  display: inline;
+  float: left;
+}
+.header-nav a {
+  padding: 14px 35px;
+  border: #d8d8d8 solid 1px;
+  border-right: none;
+  color: #283745;
+  font-weight: 700;
+}
+.header-nav a:hover {
+  background: #f1f2f2;
+}
+.header-nav a.active {
+  background: #283745;
+  color: #fff;
+  border: #283745 solid 1px;
+  border-right: none;
+}
+.header-nav a.active:hover {
+  background: #34485b;
+}
+.header-nav li:first-child a {
+  border-radius: 4px 0 0 4px;
+}
+.header-nav li:last-child a {
+  border-right: #d8d8d8 solid 1px;
+  border-radius: 0 4px 4px 0;
+}
+
+.header-links {
+  font-size: 14px;
+  font-weight: 700;
+  float: right;
+  text-transform: uppercase;
+  position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.header-username {
+  color: #9B9B9B;
+  display: inline;
+}
+.header-links a { 
+  margin-left: 25px;
+  font-weight: 700;
+}
+
+/***** END HEADER *****/
+
+
+/***** LOGIN PAGE *****/
+
+.login-container {
+  width: 480px;
+  height: px;
+  background: #fff;
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.login-header {
+  padding: 25px;
+  border-bottom: #E9E9E9 solid 1px;
+}
+.login-header img {
+  width: 198px;
+  position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.login-form {
+  padding: 50px;
+  text-align: center;
+}
+.login-form button {
+  width: 100%;
+  margin-bottom: 35px;
+}
+
+/***** END LOGIN PAGE *****/
+
+
+/***** IMPORT PAGE *****/
+
+.file-message {
+  color: #AAAAAA;
+  font-size: 13px;
+  margin-top: 6px;
+}
+.choose-file {
+  margin-left: 25px;
+}
+.file-name {
+  font-size: 15px;
+  color: #5F615F;
+  font-weight: 500;
+  margin: 13px 50px 0 0;
+}
+.remove-file {
+  font-size: 15px;
+  font-weight: 700;
+  color: #64A75A;
+  margin-left: 5px;
+}
+
+.importing-container {
+  background: #283745;
+    padding: 50px;
+    margin-bottom: 50px;
+}
+.section-title.importing {
+  text-align: center;
+  float: left;
+  color: #fff;
+}
+.progress-bar {
+  background: #fff;
+  border-radius: 4px;
+  width: 450px;
+  height: 38px;
+  margin: 0 auto;
+  overflow: hidden;
+  float: right;
+}
+.progress {
+  background: #64A75A;
+  height: 38px;
+  padding-top: 10px;
+  color: #fff;
+  text-align: center;
+  font-weight: 500;
+}
+
+.batch-number {
+  margin-bottom: 40px;
+}
+.page-import .section-title-small {
+  float: left;
+  margin: 9px 25px 0 0;
+}
+
+.transaction-stats {
+  font-size: 17px;
+  font-weight: 700;
+}
+.transaction-qty {
+  float: left;
+  background: #fff;
+  border-radius: 4px 0 0 4px;
+  padding: 11px 15px 9px;
+}
+.transaction-sales {
+  float: left;
+  color: #fff;
+  background: #64A75A;
+  border-radius: 0 4px 4px 0;
+  padding: 11px 15px 9px;
+}
+.transaction-sales.trans-failed {
+  background: #D0021B;
+}
+
+button.retry-all {
+  background: #fff;
+  border-color: #fff;
+  color: #D0021B;
+}
+button.retry-all:hover,
+.retry-single:hover {
+  background: #D0021B;
+  border-color: #D0021B;
+  color: #fff;
+}
+
+.subs-failed .sub-number,
+.subs-failed .sub-status {
+  color: #D0021B;
+}
+.sub-status {
+  font-weight: 700;
+  color: #64A75A;
+}
+
+.errors-row {
+  padding: 0 25px 25px;
+}
+.errors-bar {
+  width: calc(100% - 123px);
+}
+.errors-title {
+  background: #A1AAAA;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 4px 0 0 4px;
+  text-transform: uppercase;
+  color: #fff;
+  float: left;
+  padding: 11px 25px;
+}
+.errors-list {
+  background: #e8e8e8;
+  float: left;
+  border-radius: 0 4px 4px 0;
+  width: calc(100% - 172px);
+}
+.errors-list li {
+  width: auto !important;
+  padding: 11px 0 11px 25px;
+}
+.retry-single {
+  background: #fff;
+  color: #D0021B;
+  border: #D0021B solid 2px;
+  font-size: 15px;
+  padding: 9px;
+  margin-right: 37px;
+}
+
+/***** END IMPORT PAGE *****/
+
+
+/***** SUBSCRIPTIONS PAGE *****/
+/***** END SUBSCRIPTIONS PAGE *****/
+
+
+/***** LOG PAGE *****/
+
+.log-filter {
+  position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.log-filter-label {
+  margin: 12px 25px 0 0;
+  font-weight: 500;
+}
+.log-filter-form {}
+.log-filter-form input {
+  display: inline;
+  width: 160px;
+  padding: 9px 10px;
+  font-size: 14px;
+  margin-bottom: 0;
+}
+.log-filter-date-start {}
+.log-filter-date-end {}
+.log-filter-form button {
+  margin-left: 10px;
+}
+
+.log-container {
+  margin-bottom: 50px;
+}
+.log-container:last-child {
+  margin-bottom: 0;
+}
+.log-date {
+  margin-bottom: 25px;
+}
+.log-row {
+  font-size: 15px;
+  display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.log-row:last-child {
+  margin-bottom: 0;
+}
+.log-time {
+  color: #A1AAAA;
+  font-weight: 700;
+  margin-right: 25px;
+  width: 9%;
+}
+.log-details {
+  width: 91%;
+  display: flex;
+  flex-wrap: wrap;
+}
+.log-label {
+  background: #283745;
+  color: #fff;
+  padding: 7px 25px;
+  border-radius: 4px 0 0 4px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.log-label-text {
+  margin-top: 6px;
+}
+.log-user {
+  text-transform: none;
+  font-weight: 500;
+  color: rgba(255,255,255,.6);
+  background: rgba(255,255,255,.1);
+  padding: 5px 7px;
+  margin-left: 25px;
+  border-radius: 4px;
+}
+.log-description {
+  background: #fff;
+  border-radius: 0 4px 4px 0;
+  padding: 7px 25px;
+  flex-grow: 1;
+}
+.log-description-text {
+  margin-top: 6px;
+  font-weight: 500;
+}
+.log-fail {
+  color: #64A75A;
+}
+.log-success {
+  color: #D0021B;
+}
+button.details {
+  padding: 5px 7px;
+  margin-top: 1px;
+  font-size: 15px;
+  color: #A1AAAA;
+  border: none;
+  background: #E8E8E8;
+  text-transform: uppercase;
+}
+button.details:hover {
+  opacity: .7;
+}
+
+.showing-details .log-time {
+  align-self: flex-start;
+    margin-top: 13px;
+}
+.showing-details .log-label,
+.showing-details .log-description {
+  border-bottom: #f0f0f0 solid 1px;
+}
+.showing-details .log-label {
+  border-radius: 4px 0 0 0;
+}
+.showing-details .log-description {
+  border-radius: 0 4px 0 0;
+}
+.log-accordion-details {
+  background: #fff;
+  padding: 25px;
+  border-radius: 0 0 4px 4px;
+  width: 100%;
+}
+.log-accordion-title-failed,
+.log-accordion-title-success {
+  font-weight: 500;
+}
+.log-accordion-title-failed {
+  color: #64A75A;
+}
+.log-accordion-title-success {
+  color: #D0021B;
+}
+.log-accordion-details ul {
+  list-style: none;
+  padding: 0;
+    margin-left: 15px;
+}
+.log-accordion-details ul:last-child {
+  margin-bottom: 0;
+}
+.log-accordion-details li {
+  margin-bottom: 5px;
+}
+
+/***** END LOG PAGE *****/
+
+
+/***** USERS PAGE *****/
+/***** END USER PAGE *****/
+
+
+
+/***** MY CSS *****/
+
+html {
+  height: 100%;
+}
+body.devise-sessions-new {
+  height: 100%;
+}
+.notice,
+.alert {
+  margin: 0;
+}
+
+.remove-file {
+  cursor: pointer;
+}
+
+button.disabled, .btn.disabled {
+  cursor: default;
+}
+
+#csv_import_file {
+  display: none;
+}
+
+.errors-bar {
+  width: 100%;
+}
+
+.subscriptions .errors-list ul {
+  padding-right: 25px;
+}
+
+/***** END MY CSS *****/
+

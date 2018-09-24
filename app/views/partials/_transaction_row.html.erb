@@ -1,0 +1,34 @@
+<div class="subs-row clearfix">
+  <ul class="clearfix">
+    <li class="sub-number"><%= transaction.id %></li>
+    <li class="name"><%= dash_if_empty transaction.name %></li>
+    <li class="email"><%= dash_if_empty transaction.email %></li>
+    <li class="product"><%= get_product_name transaction.product %></li>
+    <li class="amount"><%= dash_if_empty money transaction.amount %></li>
+    <li class="cc_number">-<%= transaction.cc_number %></li>
+    <li class="sub-status">
+      <% if transaction.status %>
+        Success
+      <% else %>
+        Failed
+      <% end %>
+    </li>
+  </ul>
+  <% unless transaction.status %>
+  <div class="errors-row clearfix">
+    <div class="errors-bar align-left">
+      <div class="errors-title">Error Code(s)</div>
+      <div class="errors-list">
+        <ul class="clearfix">
+          <% for error_code in transaction.error_codes %>
+          <li><%= error_code %></li>
+          <% end %>
+        </ul>
+      </div><!-- .errors-list -->
+    </div><!-- .errors-bar -->
+    <% unless transaction.no_retry %>
+      <!-- <button class="retry-single align-right">Retry</button> -->
+    <% end %>
+  </div><!-- .errors-row -->
+  <% end %>
+</div><!-- .subs-row -->

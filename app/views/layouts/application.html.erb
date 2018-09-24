@@ -9,11 +9,13 @@
     <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
   </head>
 
-  <body data-stripe-publishable-key="<%= CURRENT_STRIPE_PUBLISHABLE_KEY %>">
-		<p class="notice"><%= notice %></p>
-  	<p class="alert"><%= alert %></p>
+  <body class="<%= body_class %>" data-stripe-publishable-key="<%= CURRENT_STRIPE_PUBLISHABLE_KEY %>">
+    <% if user_signed_in? %>
+      <%= render partial: '/partials/header' %>
+    <% end %>
 
-    <%= render partial: 'header' %>
+<!--     <p class="notice"><%= notice %></p>
+    <p class="alert"><%= alert %></p> -->
 
     <%= yield %>
   </body>

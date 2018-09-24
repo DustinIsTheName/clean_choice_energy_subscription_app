@@ -1,0 +1,31 @@
+<header>
+  
+  <header>
+    <div class="container">
+      <div class="header-logo">
+        <%= image_tag("cce-logo.png") %>
+      </div><!-- .header-logo -->
+      <div class="header-nav">
+        <ul>
+          <li><%= link_to 'Import', import_path %></li>
+          <li><%= link_to 'Subscriptions', subscription_path %></li>
+          <li><%= link_to 'Log', log_path %></li>
+          <li><%= link_to 'Users', users_path %></li>
+        </ul>
+      </div><!-- .header-nav -->
+      <div class="header-links">
+        <div class="header-username"><%= current_user.first_name %> <%= current_user.last_name %></div>
+        <%= link_to('Logout', destroy_user_session_path, method: :delete) %>
+      </div><!-- .header-links -->
+    </div><!-- .container -->
+  </header>
+
+  <div class="navigation">
+
+  </div>
+
+  <div class="account">
+
+  </div>
+
+</header>
