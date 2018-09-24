@@ -10,7 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180922191919) do
+ActiveRecord::Schema.define(version: 20180924212853) do
+
+  create_table "delayed_jobs", force: :cascade do |t|
+    t.integer  "priority",   default: 0, null: false
+    t.integer  "attempts",   default: 0, null: false
+    t.text     "handler",                null: false
+    t.text     "last_error"
+    t.datetime "run_at"
+    t.datetime "locked_at"
+    t.datetime "failed_at"
+    t.string   "locked_by"
+    t.string   "queue"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.index ["priority", "run_at"], name: "delayed_jobs_priority"
+  end
 
   create_table "events", force: :cascade do |t|
     t.string   "name"
@@ -36,7 +51,7 @@ ActiveRecord::Schema.define(version: 20180922191919) do
     t.string   "expiration"
     t.string   "external_id"
     t.integer  "product",              limit: 8
-    t.integer  "payment_service"
+    t.string   "payment_service"
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
     t.string   "external_customer_id"

@@ -14,11 +14,13 @@ Bundler.require(*Rails.groups)
 module CleanChoiceEnergySubscriptionApp
   class Application < Rails::Application
 
+    config.autoload_paths += %W(#{config.root}/lib)
     config.autoload_paths += %W(#{config.root}/lib/functions)
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
+    config.active_job.queue_adapter = :delayed_job
 
     ShopifyAPI::Base.site = "https://#{ENV["API_KEY"]}:#{ENV["PASSWORD"]}@#{ENV["SHOPIFY_URL"]}/admin"
   end
