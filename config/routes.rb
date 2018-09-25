@@ -15,4 +15,6 @@ Rails.application.routes.draw do
     post 'import' => :import
   end
 
+  match 'download', to: 'processes#download', as: 'download', via: :get
+
 end

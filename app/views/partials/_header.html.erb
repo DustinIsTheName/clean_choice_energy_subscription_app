@@ -1,31 +1,25 @@
 <header>
-  
-  <header>
-    <div class="container">
-      <div class="header-logo">
-        <%= image_tag("cce-logo.png") %>
-      </div><!-- .header-logo -->
-      <div class="header-nav">
-        <ul>
-          <li><%= link_to 'Import', import_path %></li>
-          <li><%= link_to 'Subscriptions', subscription_path %></li>
-          <li><%= link_to 'Log', log_path %></li>
-          <li><%= link_to 'Users', users_path %></li>
-        </ul>
-      </div><!-- .header-nav -->
-      <div class="header-links">
-        <div class="header-username"><%= current_user.first_name %> <%= current_user.last_name %></div>
-        <%= link_to('Logout', destroy_user_session_path, method: :delete) %>
-      </div><!-- .header-links -->
-    </div><!-- .container -->
-  </header>
-
-  <div class="navigation">
-
-  </div>
-
-  <div class="account">
-
-  </div>
-
+  <div class="container">
+    <div class="header-logo">
+      <%= image_tag("cce-logo.png") %>
+    </div><!-- .header-logo -->
+    <div class="header-nav">
+      <ul>
+        <% if current_user.access == "importer" or current_user.access == "admin" %>
+          <li><%= active_link_to 'Import', import_path %></li>
+        <% end %>
+        <% if current_user.access == "customer_care" or current_user.access == "admin" %>
+          <li><%= active_link_to 'Subscriptions', subscription_path %></li>
+        <% end %>
+        <li><%= active_link_to 'Log', log_path %></li>
+        <% if current_user.access == "admin" %>
+          <li><%= active_link_to 'Users', users_path %></li>
+        <% end %>
+      </ul>
+    </div><!-- .header-nav -->
+    <div class="header-links">
+      <div class="header-username"><%= current_user.first_name %> <%= current_user.last_name %></div>
+      <%= link_to('Logout', destroy_user_session_path, method: :delete) %>
+    </div><!-- .header-links -->
+  </div><!-- .container -->
 </header>

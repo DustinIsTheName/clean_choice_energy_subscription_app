@@ -402,6 +402,10 @@ class ProcessesController < ApplicationController
     render json: import, :include => [:transactions]
   end
 
+  def download
+    send_file 'public/csv_template.csv', type: 'text/csv', status: 202
+  end
+
   private
 
     def recharge_http_request(url, body = nil)
