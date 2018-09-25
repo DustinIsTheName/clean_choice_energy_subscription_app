@@ -68,31 +68,37 @@ class ProcessesController < ApplicationController
             )
           rescue => e
             error_codes << e.message
-            puts Colorize.orange('Stripe Error')
+            puts Colorize.orange('Stripe Error - Token or Customer')
             puts e.message
           end
 
           ################################################################################
-          # Create Stripe Charge using the created Customer. - Stripe
+          # Create Stripe Plan and Subscription using the created Customer. - Stripe
           ################################################################################
-          if stripe_token and product
-            stripe_plan = Stripe::Plan.create(
-              :amount => (product.variants.first.price.to_f * 100).floor,
-              :interval => "month",
-              :product => {
-                :name => product.title
-              },
-              :currency => "usd"
-            )
-
-            stripe_subscription = Stripe::Subscription.create(
-              :customer => stripe_customer.id,
-              :items => [
-                {
-                  :plan => stripe_plan.id,
+          begin
+            if stripe_token and product
+              stripe_plan = Stripe::Plan.create(
+                :amount => (product.variants.first.price.to_f * 100).floor,
+                :interval => "month",
+                :product => {
+                  :name => product.title
                 },
-              ]
-            )
+                :currency => "usd"
+              )
+
+              stripe_subscription = Stripe::Subscription.create(
+                :customer => stripe_customer.id,
+                :items => [
+                  {
+                    :plan => stripe_plan.id,
+                  },
+                ]
+              )
+            end
+          rescue => e
+            error_codes << e.message
+            puts Colorize.orange('Stripe Error - Plan and Subscription')
+            puts e.message
           end
         else # row["Email"].blank?
           ################################################################################
