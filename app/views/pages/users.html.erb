@@ -1,5 +1,9 @@
 <% if current_user.access == "admin" %>
-  users
+  <div class="page-content">
+    <div class="container">
+      <div class="page-title">Users Coming Soon</div>
+    </div> 
+  </div>
 <% else %>
   <%= render partial: '/partials/permission' %>
 <% end %>

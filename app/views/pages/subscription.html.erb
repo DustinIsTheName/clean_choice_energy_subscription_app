@@ -1,5 +1,9 @@
 <% if current_user.access == "customer_care" or current_user.access == "admin" %>
-  subscription
+  <div class="page-content">
+    <div class="container">
+      <div class="page-title">Subscription Coming Soon</div>
+    </div> 
+  </div>
 <% else %>
   <%= render partial: '/partials/permission' %>
 <% end %>

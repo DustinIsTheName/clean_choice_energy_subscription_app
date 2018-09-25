@@ -7,7 +7,7 @@
         <div class="align-left">
           <div class="align-left">
             <div class="add-title">Upload CSV File</div>
-            <div class="file-message">File must end in .csv <%= link_to "(template)", download_path, target: "_blank"%></div>
+            <div class="file-message">File must end in .csv</div>
           </div>
           <button class="secondary choose-file">Choose File</button>
         </div><!-- .align-left -->
@@ -35,10 +35,18 @@
         </div>
         <div class="section-title batch-number"><% if @import %>Batch <%= @import.id %><% end %></div>
         <div class="align-left">
-          <div class="transaction-stats transactions-failed align-left"<% unless failed_transactions.length > 0 %> style="display:none;"<% end %>>
+          <div class="transaction-stats transactions-failed align-left"<% if failed_transactions %><% unless failed_transactions.length > 0 %> style="display:none;"<% else %> style="display:none;"<% end %><% end %>>
             <div class="section-title-small">Failed Transactions</div>
-            <div class="transaction-qty"><%= failed_transactions.count %> of <%= @import.transaction_count %></div>
-            <div class="transaction-sales trans-failed"><%= money failed_transactions.map{ |t| t.amount }.compact.sum %></div>
+            <div class="transaction-qty">
+              <% if failed_transactions %>
+                <%= failed_transactions.count %> of <%= @import.transaction_count %>
+              <% end %>
+              </div>
+            <div class="transaction-sales trans-failed">
+              <% if failed_transactions %>
+                <%= money failed_transactions.map{ |t| t.amount }.compact.sum %>
+              <% end %>
+              </div>
           </div><!-- .transaction-stats -->
         </div><!-- .align-left -->
         <!-- <button class="align-right retry-all"<% unless @import and failed_transactions.count > 0 %> style="display:none;"<% end %>>Retry All Failed Orders</button> -->
@@ -55,10 +63,18 @@
       </div><!-- .container -->
       <div class="container clearfix"<% unless @import and successful_transactions.count > 0 %> style="display:none;"<% end %>>
         <div class="align-left">
-          <div class="transaction-stats transactions-success align-left"<% unless successful_transactions.length > 0 %> style="display:none;"<% end %>>
+          <div class="transaction-stats transactions-success align-left"<% if successful_transactions %><% unless successful_transactions.length > 0 %> style="display:none;"<% else %> style="display:none;"<% end %><% end %>>
             <div class="section-title-small">Successful Transactions</div>
-            <div class="transaction-qty"><%= successful_transactions.count %> of <%= @import.transaction_count %></div>
-            <div class="transaction-sales"><%= money successful_transactions.map{ |t| t.amount }.compact.sum %></div>
+            <div class="transaction-qty">
+              <% if successful_transactions %>
+                <%= successful_transactions.count %> of <%= @import.transaction_count %>
+              <% end %>
+              </div>
+            <div class="transaction-sales">
+              <% if successful_transactions %>
+                <%= money successful_transactions.map{ |t| t.amount }.compact.sum %>
+              <% end %>
+              </div>
           </div><!-- .transaction-stats -->
         </div><!-- .align-left -->
       </div><!-- .container -->
