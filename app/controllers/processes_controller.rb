@@ -298,8 +298,6 @@ class ProcessesController < ApplicationController
       if stripe_subscription
         subscription.external_id = stripe_subscription.id
         subscription.payment_service = 'stripe'
-
-        ShopifyOrder.delay.create(product, subscription.first_name, subscription.last_name)
       elsif recharge_subscription
         if recharge_subscription["subscription"]
           subscription.external_id = recharge_subscription["subscription"]["id"]
@@ -351,6 +349,8 @@ class ProcessesController < ApplicationController
           ######### Set Transaction Status
           transaction.status = true
           puts Colorize.green('subscription saved')
+
+          ShopifyOrder.delay.create(product, subscription)
         else
           ######### Set Transaction Status
           transaction.status = false

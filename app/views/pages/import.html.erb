@@ -35,7 +35,7 @@
       </div>
       <div class="section-title batch-number"><% if @import %>Batch <%= @import.id %><% end %></div>
       <div class="align-left">
-        <div class="transaction-stats transactions-failed align-left"<% unless failed_transactions %> style="display:none;"<% end %>>
+        <div class="transaction-stats transactions-failed align-left"<% unless failed_transactions.length > 0 %> style="display:none;"<% end %>>
           <div class="section-title-small">Failed Transactions</div>
           <div class="transaction-qty"><%= failed_transactions.count %> of <%= @import.transaction_count %></div>
           <div class="transaction-sales trans-failed"><%= money failed_transactions.map{ |t| t.amount }.compact.sum %></div>
@@ -55,7 +55,7 @@
     </div><!-- .container -->
     <div class="container clearfix"<% unless @import and successful_transactions.count > 0 %> style="display:none;"<% end %>>
       <div class="align-left">
-        <div class="transaction-stats transactions-success align-left"<% unless successful_transactions %> style="display:none;"<% end %>>
+        <div class="transaction-stats transactions-success align-left"<% unless successful_transactions.length > 0 %> style="display:none;"<% end %>>
           <div class="section-title-small">Successful Transactions</div>
           <div class="transaction-qty"><%= successful_transactions.count %> of <%= @import.transaction_count %></div>
           <div class="transaction-sales"><%= money successful_transactions.map{ |t| t.amount }.compact.sum %></div>

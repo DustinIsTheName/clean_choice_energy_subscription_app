@@ -10,8 +10,8 @@ $(document).ready(function() {
     var $progress = $('.progress-bar .progress');
     var delay = ((Math.sqrt(progressPercent*2 + 1) * 10)/2) * CSVrows;
     console.log(progressPercent + '%', 'delay:', delay);
-    $progress.text(Math.floor(progressPercent*.9) + "%").animate({
-      width:  Math.floor(progressPercent*.9) + '%'
+    $progress.text(Math.floor(progressPercent*.92) + "%").animate({
+      width:  Math.floor(progressPercent*.92) + '%'
     }, delay);
     progressPercent++;
      
@@ -22,8 +22,8 @@ $(document).ready(function() {
     if (progressPercent == 100) {
       clearTimeout(sim);
       console.log('hold....');
-      $progress.text("90%").animate({
-        width: '90%',
+      $progress.text("92%").animate({
+        width: '92%',
       }, delay);
     }
   }
