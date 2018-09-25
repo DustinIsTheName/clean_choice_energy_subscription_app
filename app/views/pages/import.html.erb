@@ -29,13 +29,16 @@
           <div class="progress-bar">
             <% if @import %>
               <% progress_percent = (@import.transactions.count / @import.transaction_count.to_f * 100.0) %>
-              <div class="progress" style="width: <%= progress_percent %>%;"><%= progress_percent.floor %>%</div>
             <% end %>
+            <div class="progress" <% if progress_percent %>style="width: <%= progress_percent %>%;"<% end %>><% if progress_percent %><%= progress_percent.floor %>%<% end %></div>
           </div>
         </div>
         <div class="section-title batch-number"><% if @import %>Batch <%= @import.id %><% end %></div>
+        <!-- <button class="align-right retry-all"<% unless @import and failed_transactions.count > 0 %> style="display:none;"<% end %>>Retry All Failed Orders</button> -->
+      </div><!-- .container -->
+      <div class="container clearfix"<% unless @import and failed_transactions.count > 0 %> style="display:none;"<% end %>>
         <div class="align-left">
-          <div class="transaction-stats transactions-failed align-left"<% if failed_transactions %><% unless failed_transactions.length > 0 %> style="display:none;"<% else %> style="display:none;"<% end %><% end %>>
+          <div class="transaction-stats transactions-failed align-left">
             <div class="section-title-small">Failed Transactions</div>
             <div class="transaction-qty">
               <% if failed_transactions %>
@@ -49,8 +52,7 @@
               </div>
           </div><!-- .transaction-stats -->
         </div><!-- .align-left -->
-        <!-- <button class="align-right retry-all"<% unless @import and failed_transactions.count > 0 %> style="display:none;"<% end %>>Retry All Failed Orders</button> -->
-      </div><!-- .container -->
+      </div>
       <div class="container"<% unless @import and failed_transactions.count > 0 %> style="display:none;"<% end %>>
         <div class="subscriptions subs-failed clearfix">
           <%= render partial: '/partials/transaction_header' %>
@@ -63,7 +65,7 @@
       </div><!-- .container -->
       <div class="container clearfix"<% unless @import and successful_transactions.count > 0 %> style="display:none;"<% end %>>
         <div class="align-left">
-          <div class="transaction-stats transactions-success align-left"<% if successful_transactions %><% unless successful_transactions.length > 0 %> style="display:none;"<% else %> style="display:none;"<% end %><% end %>>
+          <div class="transaction-stats transactions-success align-left">
             <div class="section-title-small">Successful Transactions</div>
             <div class="transaction-qty">
               <% if successful_transactions %>

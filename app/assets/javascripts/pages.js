@@ -59,6 +59,7 @@ $(document).ready(function() {
 
   $('.import-button').click(function() {
     if (!$(this).hasClass('disabled')) {
+      $('.import-results-container').show();
 
       $('.import-button').prop('disabled', true).addClass('disabled');
       //******* Get the CSV file, read it and parse it with jQuery CSV *******
@@ -117,12 +118,8 @@ $(document).ready(function() {
 
         $('.subs-row').remove();
 
-        $('.transactions-success') // qw12
-
-
-
         if (failed_transactions.length) {
-          $('.subs-failed').parent().show().prev().find('.retry-all').show().prev().show();
+          $('.subs-failed').parent().show().prev().show();
 
           $('.transactions-failed .transaction-qty').text(failed_transactions.length + ' of ' + csv.transactions.length);
           var failed_total = failed_transactions.map(function(t) {
@@ -132,7 +129,7 @@ $(document).ready(function() {
 
           $('.transactions-failed').show();
         } else {
-          $('.subs-failed').parent().hide().prev().find('.retry-all').hide().prev().hide();
+          $('.subs-failed').parent().hide().prev().hide();
           $('.transactions-failed').hide();
         }
 
