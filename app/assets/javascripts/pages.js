@@ -105,12 +105,35 @@ $(document).ready(function() {
           }
         }
 
+        function add(a, b) {
+          if (a && b) {
+            return a + b; 
+          } else if (a) {
+            return a;
+          } else if (b) {
+            return b;
+          }
+        }
+
         $('.subs-row').remove();
+
+        $('.transactions-success') // qw12
+
+
 
         if (failed_transactions.length) {
           $('.subs-failed').parent().show().prev().find('.retry-all').show().prev().show();
+
+          $('.transactions-failed .transaction-qty').text(failed_transactions.length + ' of ' + csv.transactions.length);
+          var failed_total = failed_transactions.map(function(t) {
+            return t.amount
+          }).reduce(add, 0);
+          $('.transactions-failed .transaction-sales').text('$'+failed_total.toFixed(2));
+
+          $('.transactions-failed').show();
         } else {
           $('.subs-failed').parent().hide().prev().find('.retry-all').hide().prev().hide();
+          $('.transactions-failed').hide();
         }
 
         failed_transactions.forEach(function(row) {
@@ -140,8 +163,17 @@ $(document).ready(function() {
 
         if (successful_transactions.length) {
           $('.subs-success').parent().show().prev().show();
+
+          $('.transactions-success .transaction-qty').text(successful_transactions.length + ' of ' + csv.transactions.length);
+          var success_total = successful_transactions.map(function(t) {
+            return t.amount
+          }).reduce(add, 0);
+          $('.transactions-success .transaction-sales').text('$'+success_total.toFixed(2));
+
+          $('.transactions-success').show();
         } else {
           $('.subs-success').parent().hide().prev().hide();
+          $('.transactions-success').hide();
         }
 
         successful_transactions.forEach(function(row) {

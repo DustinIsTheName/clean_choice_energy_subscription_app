@@ -654,5 +654,14 @@ button.disabled, .btn.disabled {
   padding-right: 25px;
 }
 
+.transaction-stats {
+  display: flex;
+  align-items: center;
+
+  .section-title-small {
+    margin-right: 10px;
+  }
+}
+
 /***** END MY CSS *****/
 
