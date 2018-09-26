@@ -22,11 +22,6 @@ class ProcessesController < ApplicationController
     csv.each do |row|
       row = row.to_hash
 
-      puts row["First Name"]
-      puts row["Last Name"]
-      puts row["Credit Card #"]
-      puts row["Credit Card #"].to_s.slice(-4,4)
-
       transaction = Transaction.new
       subscription = Subscription.find_by({first_name: row["First Name"]&.strip, last_name: row["Last Name"]&.strip, cc_number: row["Credit Card #"].to_s.strip.slice(-4,4)})
       error_codes = []
@@ -356,7 +351,9 @@ class ProcessesController < ApplicationController
           transaction.status = true
           puts Colorize.green('subscription saved')
 
-          ShopifyOrder.delay.create(product, subscription)
+          if subscription.payment_service == 'stripe'
+            ShopifyOrder.delay.create(product, subscription.id)
+          end
         else
           ######### Set Transaction Status
           transaction.status = false

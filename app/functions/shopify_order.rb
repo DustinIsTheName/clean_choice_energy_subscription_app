@@ -1,7 +1,8 @@
 class ShopifyOrder
 
-  def self.create(product, subscription)
+  def self.create(product, subscription_id)
     order = ShopifyAPI::Order.new
+    subscription = Subscription.find(subscription_id)
 
     order.line_items = [
       {
@@ -22,9 +23,8 @@ class ShopifyOrder
     else
       puts Colorize.red(order.errors.messages)
     end
-    puts Colorize.green("order saved")
 
-    job_id = ShopifyOrder.delay({run_at: 1.month.from_now}).create(product, subscription).id
+    job_id = ShopifyOrder.delay({run_at: 1.month.from_now}).create(product, subscription_id).id
 
     subscription.job_id = job_id
     subscription.save
