@@ -63,7 +63,7 @@ class ProcessesController < ApplicationController
             )
 
             stripe_customer = Stripe::Customer.create(
-              :description => "Customer for jenny.rosen@example.com",
+              :description => "Customer: #{row["First Name"]} #{row["Last Name"]}",
               :source => stripe_token
             )
           rescue => e
@@ -182,7 +182,7 @@ class ProcessesController < ApplicationController
               )
 
               stripe_customer = Stripe::Customer.create(
-                :description => "Customer for jenny.rosen@example.com",
+                :description => "Customer: #{row["First Name"]} #{row["Last Name"]}",
                 :source => stripe_token
               )
             else
