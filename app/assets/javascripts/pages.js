@@ -192,4 +192,87 @@ $(document).ready(function() {
       });
     }
   });
+
+  $('.log-details .details').click(function() {
+    $(this).toggleClass('hide');
+    $(this).parent().next('.log-accordion-details').slideToggle();
+  });
+
+  $('.log-filter-form button').click(function() {
+    var startInput = $('.log-filter-date-start').val();
+    var endInput = $('.log-filter-date-end').val();
+    var hideCount = 0;
+
+    $('.log-error').remove();
+
+    if (startInput && endInput) {
+      var start, end;
+      var st = parseInt(startInput.split('-').join(''));
+      var en = parseInt(endInput.split('-').join(''));
+
+      if (st > en) {
+        start = en;
+        end = st;
+      } else {
+        start = st;
+        end = en;
+      }
+
+      $('.log-date, .log-row').each(function() {
+        var rowDate = $(this).data('date');
+
+        if (rowDate >= start && rowDate <= end) {
+          $(this).show();
+        } else {
+          $(this).hide();
+          hideCount++;
+        }
+      });
+
+      if (hideCount >= $('.log-date, .log-row').length) {
+        $('.log-container').append('<div class="no-event-within-ranged page-title">There is nothing to show for the selected dates.</div>')
+      } else {
+        $('.no-event-within-ranged').remove();
+      }
+
+    } else if (startInput) {
+      $('.log-filter').append('<div class="log-error">Please choose an end date.</div>');
+    } else if (endInput) {
+      $('.log-filter').append('<div class="log-error">Please choose a start date.</div>');
+    } else {
+      $('.log-filter').append('<div class="log-error">Please choose a start and end date.</div>');
+    }
+
+  });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

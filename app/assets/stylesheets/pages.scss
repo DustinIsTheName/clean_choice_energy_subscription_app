@@ -552,10 +552,10 @@ button.retry-all:hover,
   margin-top: 6px;
   font-weight: 500;
 }
-.log-fail {
+.log-success {
   color: #64A75A;
 }
-.log-success {
+.log-fail {
   color: #D0021B;
 }
 button.details {
@@ -595,10 +595,10 @@ button.details:hover {
 .log-accordion-title-success {
   font-weight: 500;
 }
-.log-accordion-title-failed {
+.log-accordion-title-success {
   color: #64A75A;
 }
-.log-accordion-title-success {
+.log-accordion-title-failed {
   color: #D0021B;
 }
 .log-accordion-details ul {
@@ -675,6 +675,33 @@ button.disabled, .btn.disabled {
 .header-nav li:last-child a {
   border-top-right-radius: 4px;
   border-bottom-right-radius: 4px;
+}
+
+button.details {
+  &.hide {
+    font-size: 0;
+
+    &:before {
+      content: 'Hide Details';
+      font-size: 15px;
+    }
+  }
+}
+
+.log-date {
+  margin-top: 50px;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.log-error {
+  bottom: -20px;
+  position: absolute;
+  right: 0;
+  color: #D0021B;
+  font-weight: 500;
 }
 
 /***** END MY CSS *****/

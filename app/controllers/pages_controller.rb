@@ -9,6 +9,7 @@ class PagesController < ApplicationController
   end
 
   def log
+    @events = Event.all.reverse
   end
 
   def users
