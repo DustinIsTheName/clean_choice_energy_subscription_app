@@ -2,7 +2,7 @@
 // All this logic will automatically be available in application.js.
 // You can use CoffeeScript in this file: http://coffeescript.org/
 
-$(document).ready(function() {
+function ready() {
   var sim;
 
   function startBar(progressPercent, CSVrows) {
@@ -195,7 +195,12 @@ $(document).ready(function() {
 
   $('.log-details .details').click(function() {
     $(this).toggleClass('hide');
+    $(this).closest('.log-row').toggleClass('showing-details');
     $(this).parent().next('.log-accordion-details').slideToggle();
+  });
+
+  $('.log-filter-date-start, .log-filter-date-end').change(function() {
+    $('.log-filter-form button').removeClass('reset');
   });
 
   $('.log-filter-form button').click(function() {
@@ -205,48 +210,60 @@ $(document).ready(function() {
 
     $('.log-error').remove();
 
-    if (startInput && endInput) {
-      var start, end;
-      var st = parseInt(startInput.split('-').join(''));
-      var en = parseInt(endInput.split('-').join(''));
-
-      if (st > en) {
-        start = en;
-        end = st;
-      } else {
-        start = st;
-        end = en;
-      }
-
-      $('.log-date, .log-row').each(function() {
-        var rowDate = $(this).data('date');
-
-        if (rowDate >= start && rowDate <= end) {
-          $(this).show();
-        } else {
-          $(this).hide();
-          hideCount++;
-        }
-      });
-
-      if (hideCount >= $('.log-date, .log-row').length) {
-        $('.log-container').append('<div class="no-event-within-ranged page-title">There is nothing to show for the selected dates.</div>')
-      } else {
-        $('.no-event-within-ranged').remove();
-      }
-
-    } else if (startInput) {
-      $('.log-filter').append('<div class="log-error">Please choose an end date.</div>');
-    } else if (endInput) {
-      $('.log-filter').append('<div class="log-error">Please choose a start date.</div>');
+    if ($(this).hasClass('reset')) {
+      $('.log-filter-label').text('Filter by date range');
+      $('.log-filter-form button').removeClass('reset');
+      $('.log-filter-date-start').val('');
+      $('.log-filter-date-end').val('');
+      $('.log-date, .log-row').show();
     } else {
-      $('.log-filter').append('<div class="log-error">Please choose a start and end date.</div>');
+
+      if (startInput && endInput) {
+        var start, end;
+        var st = parseInt(startInput.split('-').join(''));
+        var en = parseInt(endInput.split('-').join(''));
+
+        if (st > en) {
+          start = en;
+          end = st;
+        } else {
+          start = st;
+          end = en;
+        }
+
+        $('.log-date, .log-row').each(function() {
+          var rowDate = $(this).data('date');
+
+          if (rowDate >= start && rowDate <= end) {
+            $(this).show();
+          } else {
+            $(this).hide();
+            hideCount++;
+          }
+        });
+
+        $('.no-event-within-ranged').remove();
+        if (hideCount >= $('.log-date, .log-row').length) {
+          $('.log-container').append('<div class="no-event-within-ranged page-title">There is nothing to show for the selected dates.</div>')
+        }
+
+        $('.log-filter-label').text('Filtering by date range:');
+        $('.log-filter-form button').addClass('reset');
+
+      } else if (startInput) {
+        $('.log-filter').append('<div class="log-error">Please choose an end date.</div>');
+      } else if (endInput) {
+        $('.log-filter').append('<div class="log-error">Please choose a start date.</div>');
+      } else {
+        $('.log-filter').append('<div class="log-error">Please choose a start and end date.</div>');
+      }
     }
 
   });
-});
+}
 
-
+$(document).on('turbolinks:load', ready);
+// $(document).ready(ready);
 
 
 

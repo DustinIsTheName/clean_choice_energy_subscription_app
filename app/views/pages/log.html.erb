@@ -25,7 +25,7 @@
           <% current_date = new_date %>
         <% end %>
 
-        <div class="log-row showing-details clearfix" data-date="<%= event.created_at.strftime('%Y%m%d') %>">
+        <div class="log-row clearfix" data-date="<%= event.created_at.strftime('%Y%m%d') %>">
           <div class="log-time align-left"><%= event.created_at.in_time_zone("Eastern Time (US & Canada)").strftime('%-I:%M%P') %> EST</div>
           <div class="log-details align-right">
             <div class="log-label align-left clearfix">

@@ -704,6 +704,15 @@ button.details {
   font-weight: 500;
 }
 
+.log-filter-form button.reset {
+  font-size: 0;
+
+  &:before {
+    content: 'Reset';
+    font-size: 15px;
+  }
+}
+
 /***** END MY CSS *****/
 
 
