@@ -17,7 +17,7 @@
         </div><!-- .align-right -->
       </div><!-- .add-container -->
     </div><!-- .container -->
-    <hr/>
+    <hr<% unless @import %> style="display:none;" <% end %>/>
     <div class="import-results-container"<% unless @import %> style="display:none;"<% end %>>
       <% if @import %>
         <% successful_transactions = @import.transactions.select{|t| t.status} %>

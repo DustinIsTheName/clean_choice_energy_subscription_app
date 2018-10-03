@@ -60,6 +60,7 @@ function ready() {
   $('.import-button').click(function() {
     if (!$(this).hasClass('disabled')) {
       $('.import-results-container').show();
+      $('.import-results-container').prev().show();
 
       $('.import-button').prop('disabled', true).addClass('disabled');
       //******* Get the CSV file, read it and parse it with jQuery CSV *******
@@ -259,6 +260,40 @@ function ready() {
       }
     }
 
+  });
+
+  $('#reveal-add-single-subscription').click(function() {
+    $('.add-container').slideToggle();
+  });
+
+  $('.email-filter li').click(function() {
+    var filter = $(this).data('filter');
+
+    $('.email-filter li').removeClass('active');
+    $(this).addClass('active');
+
+    $('.subs-row').hide();
+    $(filter).show();
+  });
+
+  $(document).on('click', '.button-delete', function(e) {
+    e.preventDefault();
+    var $this = $(this);
+    var sub_id = $this.closest('.subs-row').data('sub-id');
+
+    if (!$this.hasClass('is-loading')) {
+      $this.addClass('is-loading');
+
+      $.ajax({
+        type: "POST",
+        url: '/delete',
+        data: {subscription_id: sub_id}
+      }).success(function(response) {
+        console.log(response);
+
+        $this.closest('.subs-row').remove();
+      });
+    }
   });
 }
 

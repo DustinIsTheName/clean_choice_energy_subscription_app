@@ -12,11 +12,14 @@ class ProcessesController < ApplicationController
     csv_text = File.read(params["CsvDoc"].path)
     csv = CSV.parse(csv_text, :headers => true)
 
-    Import.destroy_all
-    Transaction.destroy_all
+    if current_user.import
+      current_user.import.transactions.destroy_all
+      current_user.import.destroy
+    end
 
     import = Import.new
     import.transaction_count = csv.count
+    import.user_id = current_user.id
     import.save
 
     csv.each do |row|
@@ -120,7 +123,7 @@ class ProcessesController < ApplicationController
               "billing_phone": "1-800-555-1234"
             }
 
-            recharge_customer = recharge_http_request(url, customer_params)
+            recharge_customer = recharge_http_request(url, customer_params, "post")
 
             puts Colorize.bright('recharge_customer')
             puts Colorize.bright(recharge_customer)
@@ -146,7 +149,7 @@ class ProcessesController < ApplicationController
               end
             end
 
-            recharge_address = recharge_http_request(url, address_params)
+            recharge_address = recharge_http_request(url, address_params, "post")
 
             if recharge_address["errors"]
               recharge_address["errors"].each do |error_message|
@@ -217,7 +220,7 @@ class ProcessesController < ApplicationController
                 "stripe_customer_token": stripe_customer.id
               }
 
-              recharge_subscription = recharge_http_request(url, subscription_params)
+              recharge_subscription = recharge_http_request(url, subscription_params, "post")
 
               if recharge_subscription["errors"]
                 recharge_subscription["errors"].each do |error_message|
@@ -273,6 +276,7 @@ class ProcessesController < ApplicationController
         transaction.amount = product.variants.first.price
 
         subscription.product = product.id
+        subscription.amount = product.variants.first.price
       else
         error_codes << 'Product not found'
       end
@@ -342,6 +346,20 @@ class ProcessesController < ApplicationController
       if error_codes.size > 0
         transaction.status = false
         puts Colorize.red('errors present, so skip saving subscription')
+
+        if recharge_customer and recharge_customer["customer"]
+          puts recharge_customer
+          puts Colorize.red('stripe_customer delete')
+          url = URI("https://api.rechargeapps.com/customers/#{recharge_customer["customer"]["id"]}")
+          recharge_http_request(url, "{\n\n}", "delete")
+          # qw12
+        end
+
+        if stripe_customer
+          puts stripe_customer
+          puts Colorize.red('stripe_customer delete')
+          stripe_customer.delete
+        end
       else
         ################################################################################
         # Save the Subscription and recored errors if they fail. - Subscription/Transaction
@@ -359,6 +377,15 @@ class ProcessesController < ApplicationController
           transaction.status = false
           subscription.errors.messages.each do |error_message|
             error_codes << (error_message.first.to_s << ' ' << error_message.last.first)
+          end
+          if recharge_customer and recharge_customer["customer"]
+            url = URI("https://api.rechargeapps.com/customers/#{["customer"]["id"]}")
+            recharge_http_request(url, "{\n\n}", "delete")
+            # qw12
+          end
+
+          if stripe_customer
+            stripe_customer.delete
           end
           puts Colorize.red('subscription error')
         end
@@ -399,22 +426,80 @@ class ProcessesController < ApplicationController
     render json: import, :include => [:transactions]
   end
 
+  def delete
+    puts params
+
+    subscription = Subscription.find(params[:subscription_id])
+
+    if subscription.payment_service == "recharge"
+
+      url = URI("https://api.rechargeapps.com/customers/#{subscription.external_customer_id}")
+
+      recharge_customer = recharge_http_request(url)
+
+      puts Colorize.blue(subscription.external_customer_id)
+      puts Colorize.orange(recharge_customer)
+
+      if recharge_customer["id"]
+        stripe_customer = Stripe::Customer.retrieve(recharge_customer["stripe_customer_token"])
+
+        if stripe_customer 
+          stripe_customer.delete
+        end
+
+        recharge_http_request(url, "{\n\n}", "delete")
+      end
+
+    elsif subscription.payment_service == "stripe"
+
+      begin
+        stripe_customer = Stripe::Customer.retrieve(subscription.external_customer_id)
+        stripe_subscription = Stripe::Subscription.retrieve(subscription.external_id)
+
+        if stripe_customer
+          stripe_customer.delete
+        end
+
+        if stripe_subscription
+          stripe_subscription.delete
+        end
+      rescue => e
+        puts e
+      end
+
+    end
+
+    subscription.destroy
+
+    render json: {
+      subscription: subscription,
+      recharge_customer: recharge_customer,
+      stripe_customer: stripe_customer,
+
+    }
+  end
+
   def download
     send_file 'public/csv_template.csv', type: 'text/csv', status: 202
   end
 
   private
 
-    def recharge_http_request(url, body = nil)
+    def recharge_http_request(url, body = nil, type = nil)
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = true
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
-      if body
+      if type == "delete"
+        request = Net::HTTP::Delete.new(url)
+      elsif type == "post"
         request = Net::HTTP::Post.new(url)
+      elsif type == "get"
+        request = Net::HTTP::Get.new(url)
       else
         request = Net::HTTP::Get.new(url)
       end
+
       request["x-recharge-access-token"] = ENV['RECHARGE_API_KEY']
       request["content-type"] = 'application/json'
 

@@ -19,20 +19,38 @@ a {
 a:hover {
   color: #83b97b;
 }
-input {
+input, select {
   display: block;
   width: 100%;
   padding: 13px 25px;
   margin-bottom: 10px;
   border: #3F94D3 solid 1px;
+  background: #fff;
   border-radius: 4px;
   font-size: 17px;
   font-weight: 500;
   line-height: 1;
   -webkit-appearance: none;
 }
-input::placeholder {
+input::placeholder,
+select::placeholder {
   color: #A1AAAA;
+}
+.dropdown {
+  position: relative;
+}
+.dropdown:after {
+    content: "";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    width: 0; 
+    height: 0; 
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #3F94D3;
 }
 button, .btn {
   padding: 10px 25px;
@@ -76,6 +94,15 @@ button.secondary.disabled:hover, .btn.secondary.disabled:hover {
   color: #d8d8d8;
   opacity: 1;
 }
+button.load-more {
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+button:focus {
+  outline: none;
+}
+
 .container {
   width: 1180px;
   margin: 0 auto;
@@ -125,7 +152,7 @@ hr {
   font-weight: bold;
 }
 
-.subscriptions {
+.subscriptions, .users {
   width: 100%;
   margin-top: 15px;
   font-weight: 500;
@@ -133,26 +160,31 @@ hr {
 .subscriptions.subs-failed {
   margin-bottom: 50px;
 }
-.subs-row { 
+.subs-row, .users-row { 
   border-bottom: #d8d8d8 solid 1px;
 }
-.subscriptions .subs-row:nth-child(2n) {
+.subscriptions .subs-row:nth-child(2n),
+.users .users-row:nth-child(2n) {
   background: #fff;
 }
-.subscriptions .subs-row:nth-child(2n+1) {
+.subscriptions .subs-row:nth-child(2n+1),
+.users .users-row:nth-child(2n+1) {
   background: #f5f5f5;
 }
-.subscriptions ul {
+.subscriptions ul,
+.users ul {
   list-style: none;
   padding: 0;
   margin: 0;
 } 
-.subscriptions li {
+.subscriptions li,
+.users li {
   border: none;
   display: inline;
   float: left;
 }
-.subscriptions .subs-header li {
+.subscriptions .subs-header li,
+.users .users-header li {
   background: #283745 !important;
   color: #fff;
   display: block;
@@ -162,8 +194,26 @@ hr {
   padding: 21px 0 19px;
   text-align: center;
 }
-.subscriptions li:first-child {
+.users li { 
+  width: calc(85% / 3);
+  padding: 21px 0 19px;
+  text-align: center;
+}
+.subscriptions li:first-child,
+.users li:first-child {
   width: 5%;
+}
+.users li:last-child {
+  width: 10%;
+  height: 57px;
+}
+.edit-delete {
+  display: flex !important;
+    align-items: center;
+    justify-content: space-evenly;
+}
+.edit-delete a:hover {
+  opacity: .7;
 }
 
 /***** END GENERAL *****/
@@ -465,6 +515,134 @@ button.retry-all:hover,
 
 
 /***** SUBSCRIPTIONS PAGE *****/
+
+.pages-subscription .page-title-container button {
+  position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.pages-subscription .add-container {
+  margin-bottom: 50px;
+}
+.pages-subscription .add-title {
+  margin-bottom: 50px;
+}
+.add-subscription-fields {
+  display: flex;
+  flex-wrap: wrap;
+  width: 90%;
+}
+.add-subscription-fields input,
+.add-subscription-fields .dropdown {
+  width: 31%;
+  margin-bottom: 10px;
+}
+.add-subscription-fields input {
+  margin-right: 25px;
+}
+.add-subscription-fields input:nth-child(n+4),
+.add-subscription-fields .dropdown,
+.add-subscription-fields .dropdown select {
+  height: 48px;
+}
+.add-subscription-fields input:nth-child(3n) {
+  margin-right: 0;
+}
+.add-subscription-fields .dropdown:nth-of-type(2) {
+  margin-left: calc(31% + 25px);
+}
+.add-subscription-fields input:last-child {
+  margin-left: -31%;
+    margin-top: 58px;
+    margin-bottom: 0;
+}
+.add-subscription-fields button {
+  align-self: flex-start;
+}
+
+.subscriptions-filter-bar {
+  background: #283745;
+  padding: 25px 0;
+  margin-bottom: 50px;
+}
+.subscriptions-filter {}
+.subscriptions-filter-label {
+  margin: 12px 25px 0 0;
+  font-weight: 500;
+  color: #fff;
+}
+.subscriptions-filter-form {}
+.subscriptions-filter-form ul {
+  color: #64A75A;
+  margin: 0;
+  padding: 0;
+}
+.subscriptions-filter-form li {
+  display: inline;
+  float: left;
+}
+.subscriptions-filter-form li button {
+  margin: 0;
+  padding: 12px 15px;
+  background: #fff;
+  color: #64A75A;
+  border: none;
+  border-radius: 0;
+  border-right: #E8E8E8 solid 1px;
+}
+.subscriptions-filter-form li button:hover {
+  background: #f1f2f2;
+}
+.subscriptions-filter-form li.active button {
+  background: #64A75A;
+  color: #fff;
+  border-right: none;
+}
+.subscriptions-filter-form li.active button:hover {
+  background: #83b97b;
+}
+.subscriptions-filter-form li:first-child button {
+  border-radius: 4px 0 0 4px;
+}
+.subscriptions-filter-form li:last-child button {
+  border-radius: 0 4px 4px 0;
+  border-right: none;
+}
+.subscriptions-filter-form li.active:nth-child(2) button {
+  border-right: none;
+}
+
+.subscriptions-filter-form input {
+  display: inline;
+  width: 230px;
+  padding: 13px 25px 12px;
+  font-size: 14px;
+  margin-bottom: 0;
+  border: none;
+}
+.subscriptions-filter-form button {
+  margin-left: 10px;
+}
+
+.pages-subscription .subscriptions {
+  margin-top: 0;
+}
+.pages-subscription .subscriptions li { 
+  width: calc(85% / 6);
+  padding: 21px 0 19px;
+  text-align: center;
+}
+.pages-subscription .subscriptions li:first-child {
+  width: 5%;
+}
+.pages-subscription .subscriptions li:last-child {
+  width: 10%;
+  height: 57px;
+}
+.pages-subscription .load-more {
+  margin-top: 50px;
+}
+
 /***** END SUBSCRIPTIONS PAGE *****/
 
 
@@ -617,11 +795,103 @@ button.details:hover {
 
 
 /***** USERS PAGE *****/
+
+.page-users .page-title-container button {
+  position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.page-users .add-container {
+  margin-bottom: 50px;
+}
+.page-users .add-title {
+  margin-bottom: 50px;
+}
+.add-user-fields {
+  display: flex;
+  flex-wrap: wrap;
+  width: 90%;
+}
+.add-user-fields input,
+.add-user-fields .dropdown {
+  width: 31%;
+  margin-bottom: 10px;
+}
+.add-user-fields input {
+  margin-right: 25px;
+}
+.add-user-fields input:nth-child(n+4),
+.add-user-fields .dropdown,
+.add-user-fields .dropdown select {
+  margin-bottom: 0;
+  height: 48px;
+}
+.add-user-fields input:nth-child(3n) {
+  margin-right: 0;
+}
+.add-user-fields button {
+  align-self: flex-start;
+}
+
 /***** END USER PAGE *****/
 
 
 
 /***** MY CSS *****/
+
+@-webkit-keyframes btn-loading-spinner {
+  from {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg)
+  }
+
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg)
+  }
+}
+
+@keyframes btn-loading-spinner {
+  from {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg)
+  }
+
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg)
+  }
+}
+
+.is-loading,
+.is-loading:hover {
+  color: transparent !important;
+  position: relative !important;
+  background-image: none !important;
+
+  &:before {
+    // background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2020%2020%22%3E%3Cstyle%20type=%22text/css%22%3Ecircle,ellipse,line,path,polygon,polyline,rect,text%7Bfill:white%20!important;%20%7D%3C/style%3E%3Cpath%20d=%22M6.876%200.267c-3.956%201.419-6.649%205.184-6.649%209.459%200%205.548%204.492%2010.046%2010.034%2010.046%204.297%200%208.075-2.729%209.473-6.724%200.124-0.355-0.063-0.744-0.418-0.869s-0.744%200.063-0.869%200.418c-1.208%203.452-4.473%205.811-8.186%205.811-4.789%200-8.671-3.887-8.671-8.682%200-3.696%202.327-6.95%205.745-8.176%200.354-0.127%200.539-0.518%200.412-0.872s-0.518-0.539-0.872-0.412z%22/%3E%3C/svg%3E");
+    content: '' !important;
+    border: 1px solid #fff;
+    border-right: 0;
+    border-bottom: 0;
+    border-radius: 50%;
+    margin-top: -8px;
+    margin-left: -8px;
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-animation: btn-loading-spinner 0.7s linear infinite;
+    animation: btn-loading-spinner 0.7s linear infinite;
+    z-index: 3;
+  }
+
+  * {
+    visibility: hidden;
+  }
+}
 
 html {
   height: 100%;
@@ -711,6 +981,10 @@ button.details {
     content: 'Reset';
     font-size: 15px;
   }
+}
+
+.button-delete.is-loading:before {
+  border-color: #83b97b;
 }
 
 /***** END MY CSS *****/

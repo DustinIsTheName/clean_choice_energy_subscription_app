@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   controller :processes do
     post 'import' => :import
+    post 'delete' => :delete
   end
 
   match 'download', to: 'processes#download', as: 'download', via: :get
