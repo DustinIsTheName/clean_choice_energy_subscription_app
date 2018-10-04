@@ -447,32 +447,75 @@ function ready() {
     }
   });
 
+  $('body').on('keyup', '.search-input', function(e) {
+    console.log('d');
+    $('.search').removeClass('reset');
+  });
+
   $('body').on('click', '.search', function(e) {
     if (!$('.search').hasClass('is-loading')) {
-      $('.search').addClass('is-loading')
 
-      page = 1;
-      search = $('.search-input').val();
+      if (!$('.search').hasClass('reset')) {
 
-      $.ajax({
-        type: "GET",
-        url: '/subscription_page',
-        data: {
-          page: page,
-          search: search
-        }
-      }).success(function(pagination) {
-        console.log(pagination);
-        $('.search').removeClass('is-loading')
-        $('.subscriptions .subs-row').remove();
-        $('.subscriptions').append(pagination.html);
+        $('.subscriptions-filter-label').text('Searching by:');
+        $('.search').addClass('is-loading');
 
-        if (pagination.load_more) {
-          $('.load-more').show();
-        } else {
-          $('.load-more').hide();
-        }
-      });
+        page = 1;
+        search = $('.search-input').val();
+
+        $.ajax({
+          type: "GET",
+          url: '/subscription_page',
+          data: {
+            page: page,
+            search: search
+          }
+        }).success(function(pagination) {
+          console.log(pagination);
+          $('.search').removeClass('is-loading').addClass('reset');
+          $('.subscriptions .subs-row').remove();
+          if (pagination.html) {
+            $('.subscriptions').append(pagination.html);
+          } else {
+            $('.subscriptions').append('<div class="subs-row clearfix" style="padding: 21px 20px 19px;text-align: center;">No results for "'+search+'".</div>');
+          }
+
+          if (pagination.load_more) {
+            $('.load-more').show();
+          } else {
+            $('.load-more').hide();
+          }
+        });
+      } else {
+        search = '';
+
+        $('.search-input').val('');
+        $('.subscriptions-filter-label').text('Search by Customer Name');
+
+        $.ajax({
+          type: "GET",
+          url: '/subscription_page',
+          data: {
+            page: page,
+            search: search
+          }
+        }).success(function(pagination) {
+          console.log(pagination);
+          $('.search').removeClass('is-loading').removeClass('reset');
+          $('.subscriptions .subs-row').remove();
+          if (pagination.html) {
+            $('.subscriptions').append(pagination.html);
+          } else {
+            $('.subscriptions').append('<div class="subs-row clearfix" style="padding: 21px 20px 19px;text-align: center;">No results for "'+search+'".</div>');
+          }
+
+          if (pagination.load_more) {
+            $('.load-more').show();
+          } else {
+            $('.load-more').hide();
+          }
+        });
+      }
     }
   });
 }

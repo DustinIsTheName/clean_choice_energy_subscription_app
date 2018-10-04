@@ -989,7 +989,7 @@ button.details {
 
   &:before {
     content: 'Reset';
-    font-size: 15px;
+    font-size: 17px;
   }
 }
 
@@ -1031,6 +1031,15 @@ button.details {
         font-weight: 500;
       }
     }
+  }
+}
+
+.search.reset {
+  font-size: 0;
+
+  &:before {
+    content: 'Reset';
+    font-size: 17px;
   }
 }
 
