@@ -7,12 +7,15 @@ Rails.application.routes.draw do
   controller :pages do
     get 'import' => :import
     get 'subscription' => :subscription
+    get 'subscription_page' => :subscription_page
     get 'log' => :log
     get 'users' => :users
   end
 
   controller :processes do
     post 'import' => :import
+    post 'single' => :single
+    post 'edit' => :edit
     post 'delete' => :delete
   end
 

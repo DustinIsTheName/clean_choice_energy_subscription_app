@@ -50,4 +50,10 @@ module ApplicationHelper
 
     ApplicationController.new.render_to_string(partial: '/partials/transaction_row', locals: {transaction: transaction})
   end
+
+  def empty_subscription_row
+    subscription = Subscription.new
+
+    ApplicationController.new.render_to_string(partial: '/partials/subscription_row', locals: {subscription: subscription})
+  end
 end

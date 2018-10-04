@@ -1,7 +1,9 @@
 <% if current_user.access == "customer_care" or current_user.access == "admin" %>
   
-  <% if false %>
-    <div class="page-content">
+  <% if true %>
+    <% page_limit = 5 %>
+
+    <div class="page-content subscription-page" data-empty-subscription-row="<%= empty_subscription_row.gsub("\n", " ") %>">
       <div class="container page-title-container">
         <div class="page-title align-left">Subscriptions</div>
         <button id="reveal-add-single-subscription" class="align-right">Add Subscription</button>
@@ -9,25 +11,25 @@
       <div class="container">
         <div class="add-container clearfix" style="display: none;">
           <div class="add-title">Add Subscription</div>
-          <div class="add-subscription-form">
+          <div class="add-subscription-form clearfix">
             <div class="add-subscription-fields align-left">
-              <input type="text" placeholder="First Name" tabindex="1"/>
-              <input type="text" placeholder="Street Address" tabindex="4"/>
-              <input type="text" placeholder="Credit Card #" tabindex="9"/>
-              <input type="text" placeholder="Last Name" tabindex="2"/>
-              <input type="text" placeholder="Street Address 2" tabindex="5"/>
-              <input type="text" placeholder="Expiration (MM/YY)" tabindex="10"/>
-              <input type="email" placeholder="Email Address" tabindex="3"/>
-              <input type="text" placeholder="City" tabindex="6"/>
+              <input class="single-subscription-field" type="text" name="First Name" placeholder="First Name" tabindex="1"/>
+              <input class="single-subscription-field" type="text" name="Street Address" placeholder="Street Address" tabindex="4"/>
+              <input class="single-subscription-field" type="text" name="Credit Card #" placeholder="Credit Card #" tabindex="9"/>
+              <input class="single-subscription-field" type="text" name="Last Name" placeholder="Last Name" tabindex="2"/>
+              <input class="single-subscription-field" type="text" name="Street Address 2" placeholder="Street Address 2" tabindex="5"/>
+              <input class="single-subscription-field" type="text" name="Credit Card Expiration (MM/YY)" placeholder="Expiration (MM/YY)" tabindex="10"/>
+              <input class="single-subscription-field" type="email" name="Email" placeholder="Email Address" tabindex="3"/>
+              <input class="single-subscription-field" type="text" name="City" placeholder="City" tabindex="6"/>
               <div class="dropdown">
-                <select tabindex="11">
+                <select class="single-subscription-field" tabindex="11" name="Subscription Product">
                   <option selected="true" disabled="disabled">Subscription Product</option>
                   <option value="1602141356074">NREC</option>
                   <option value="1602140700714">Clean Furnace</option>
                 </select>
               </div><!-- .dropdown -->
               <div class="dropdown">
-                <select tabindex="7">
+                <select class="single-subscription-field" tabindex="7" name="State">
                   <option selected="true" disabled="disabled">State</option>
                   <option value="AL">Alabama</option>
                   <option value="AK">Alaska</option>
@@ -82,7 +84,7 @@
                   <option value="WY">Wyoming</option>
                 </select>
               </div><!-- .dropdown -->
-              <input type="text" placeholder="Zip" tabindex="8"/>
+              <input class="single-subscription-field" type="text" name="Zip" placeholder="Zip" tabindex="8"/>
             </div><!-- .add-subscription-fields -->
             <button id="add-single-subscription" class="align-right" tabindex="12">Add</button>
           </div><!-- .add-subscription-form -->
@@ -94,17 +96,17 @@
             <div class="subscriptions-filter-label align-left">Filter</div>
             <div class="subscriptions-filter-form align-left">
               <ul class="email-filter">
-                <li class="active" data-filter=".email, .no-email"><button>All</button></li>
-                <li data-filter=".email"><button>Email</button></li>
-                <li data-filter=".no-email"><button>No Email</button></li>
+                <li class="active" data-filter=""><button>All</button></li>
+                <li data-filter="hide-email"><button>Email</button></li>
+                <li data-filter="hide-no-email"><button>No Email</button></li>
               </ul>
             </div><!-- .subscriptions-filter-form -->
           </div><!-- .subscriptions-filter -->
           <div class="subscriptions-filter align-right">
             <div class="subscriptions-filter-label align-left">Search by Customer Name</div>
             <div class="subscriptions-filter-form align-left">
-              <input type="text" placeholder="ex: John Doe" />
-              <button class="align-right">Search</button>
+              <input class="search-input" type="text" placeholder="ex: John Doe" />
+              <button class="align-right search">Search</button>
             </div><!-- .subscriptions-filter-form -->
           </div><!-- .subscriptions-filter -->
         </div><!-- .container -->
@@ -124,29 +126,13 @@
             </ul>
           </div><!-- .subs-header -->
           <% for subscription in @subscriptions %>
-            <div data-sub-id="<%= subscription.id %>" class="subs-row clearfix <% if subscription.email %>email<% else %>no-email<% end %>">
-              <ul>
-                <li class="sub-number"><%= subscription.id %></li>
-                <li><%= subscription.first_name %> <%= subscription.last_name %></li>
-                <li><%= dash_if_empty subscription.email %></li>
-                <li><%= get_product_name subscription.product %></li>
-                <li><%= dash_if_empty money subscription.amount %></li>
-                <li>-<%= subscription.cc_number %></li>
-                <li><%= subscription.created_at.strftime '%-m/%-d/%y, %l:%M%P' %></li>
-                <li class="edit-delete">
-                  <a href="" class="button-edit">
-                    <%= image_tag("edit.png") %>
-                  </a>
-                  <a href="" class="button-delete">
-                    <%= image_tag("delete.png") %>
-                  </a>
-                </li><!-- .edit-delete -->
-              </ul>
-            </div><!-- .subs-row -->
+            <%= render partial: '/partials/subscription_row', locals: {subscription: subscription} %>
           <% end %>
           
         </div><!-- subscriptions -->
-        <button class="load-more">Load more</button>
+        <% if @load_more %>
+          <button class="load-more">Load more</button>
+        <% end %>
       </div><!-- .container -->
     </div><!-- .page-content -->
   <% else %>

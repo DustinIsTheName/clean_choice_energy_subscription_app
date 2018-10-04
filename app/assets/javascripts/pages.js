@@ -5,11 +5,28 @@
 function ready() {
   var sim;
 
+  function dashIfEmpty(value) {
+    if (value) {
+      return value;
+    } else {
+      return '-';
+    }
+  }
+
+  function add(a, b) {
+    if (a && b) {
+      return a + b; 
+    } else if (a) {
+      return a;
+    } else if (b) {
+      return b;
+    }
+  }
+
   function startBar(progressPercent, CSVrows) {
     var $progressBar = $('.progress-bar');
     var $progress = $('.progress-bar .progress');
     var delay = ((Math.sqrt(progressPercent*2 + 1) * 10)/2) * CSVrows;
-    console.log(progressPercent + '%', 'delay:', delay);
     $progress.text(Math.floor(progressPercent*.92) + "%").animate({
       width:  Math.floor(progressPercent*.92) + '%'
     }, delay);
@@ -98,24 +115,6 @@ function ready() {
 
         successful_transactions = csv.transactions.filter(t => t.status);
         failed_transactions = csv.transactions.filter(t => !t.status);
-
-        function dashIfEmpty(value) {
-          if (value) {
-            return value;
-          } else {
-            return '-';
-          }
-        }
-
-        function add(a, b) {
-          if (a && b) {
-            return a + b; 
-          } else if (a) {
-            return a;
-          } else if (b) {
-            return b;
-          }
-        }
 
         $('.subs-row').remove();
 
@@ -272,26 +271,207 @@ function ready() {
     $('.email-filter li').removeClass('active');
     $(this).addClass('active');
 
-    $('.subs-row').hide();
-    $(filter).show();
+    $('.subscriptions').removeClass('hide-email hide-no-email');
+    $('.subscriptions').addClass(filter);
+
+
   });
 
-  $(document).on('click', '.button-delete', function(e) {
-    e.preventDefault();
-    var $this = $(this);
-    var sub_id = $this.closest('.subs-row').data('sub-id');
+  $('#add-single-subscription').click(function() {
+    var row = {}
 
-    if (!$this.hasClass('is-loading')) {
-      $this.addClass('is-loading');
+    $('#add-single-subscription').addClass('is-loading');
+
+    $('.single-subscription-field').each(function() {
+      row[$(this).attr('name')] = $(this).val();
+    });
+
+    $.ajax({
+      type: "POST",
+      url: '/single',
+      data: {row: row}
+    }).success(function(single_import) {
+      console.log(single_import);
+      var transaction = single_import.transactions[0]
+
+      $('.errors-row').remove();
+      if (transaction.error_codes.length) {
+
+        html = '<div class="errors-row clearfix">';
+        html +=   '<div class="errors-bar align-left">';
+        html +=     '<div class="errors-title">Error Code(s)</div>';
+        html +=     '<div class="errors-list">';
+        html +=       '<ul class="clearfix">';
+        for (var i = 0; i < transaction.error_codes.length; i++) {
+        html +=         '<li>'+transaction.error_codes[i]+'</li>';
+        }
+        html +=       '</ul>';
+        html +=     '</div>';
+        html +=   '</div>';
+        html += '</div>';
+
+        $('.add-container').append(html);
+
+      } else {
+        var $emptyRow = $($('.subscription-page').data('empty-subscription-row'));
+        var $newRow = $emptyRow.clone();
+
+        var date = new Date(transaction.created_at).toLocaleString('en-US', {day: 'numeric', month: 'numeric', year: '2-digit', hour: 'numeric', minute: 'numeric'}).toLowerCase().replace(' pm', 'pm');
+
+        if (transaction.email) {
+          $newRow.addClass('email').removeClass('no-email');
+          $newRow.attr('data-sub-id', transaction.subscription_id);
+        }
+
+        $newRow.find('.sub-number').text(transaction.subscription_id);
+        $newRow.find('.name').text(transaction.name);
+        $newRow.find('.email').text(dashIfEmpty(transaction.email));
+        $newRow.find('.product').text(transaction.product);
+        $newRow.find('.amount').text('$' + transaction.amount.toFixed(2));
+        $newRow.find('.cc_number').text('-'+transaction.cc_number);
+        $newRow.find('.sub-date').text(date);
+
+        console.log(transaction);
+
+        $('.subscriptions .subs-header').after($newRow);
+      }
+      $('#add-single-subscription').removeClass('is-loading');
+    });
+  });
+
+  $('body').on('click', '.button-edit', function(e) {
+    e.preventDefault();
+    var $subsRow = $(this).closest('.subs-row');
+    var firstName = $subsRow.find('.name .first').text();
+    var lastName = $subsRow.find('.name .last').text();
+    var email = $subsRow.find('.email').text();
+
+    if (!firstName || !lastName) {
+      var nameArray = $subsRow.find('.name').text().split(' ');
+      lastName = nameArray.pop();
+      firstName = nameArray.join(' ');
+    }
+    if (email === '-') {
+      email = '';
+    }
+      var $this = $(this);
+
+    $subsRow.find('.button-edit').hide();
+    $subsRow.find('.button-delete').hide();
+    $subsRow.find('.button-edit-save').show();
+
+    $subsRow.find('.name').html('<input class="single-subscription-field" name="first-name" placeholder="First Name" value="'+firstName+'"><input class="single-subscription-field" name="last-name" placeholder="Last Name" value="'+lastName+'">');
+    $subsRow.find('.email').html('<input class="single-subscription-field" name="email" placeholder="Email" value="'+email+'">');
+  });
+
+  $('body').on('click', '.button-edit-save', function(e) {
+    e.preventDefault();
+    var $subsRow = $(this).closest('.subs-row');
+
+    if (!$subsRow.find('.button-edit-save').hasClass('is-loading')) {
+      $subsRow.find('.button-edit-save').addClass('is-loading');
+      var sub_id = $subsRow.attr('data-sub-id');
 
       $.ajax({
         type: "POST",
-        url: '/delete',
-        data: {subscription_id: sub_id}
+        url: '/edit',
+        data: {
+          subscription_id: sub_id,
+          first_name: $subsRow.find('[name="first-name"]').val(),
+          last_name: $subsRow.find('[name="last-name"]').val(),
+          email: $subsRow.find('[name="email"]').val()
+        }
       }).success(function(response) {
         console.log(response);
 
-        $this.closest('.subs-row').remove();
+        $subsRow.find('.button-edit-save').removeClass('is-loading').hide();
+        $subsRow.find('.button-delete').show();
+        $subsRow.find('.button-edit').show();
+        $subsRow.find('.name').html('<span class="first">'+response.first_name+'</span> <span class="last">'+response.last_name+'</span>');
+        $subsRow.find('.email').html(response.email);
+      });
+    }
+  });
+
+  $('body').on('click', '.button-delete', function(e) {
+    var $this = $(this);
+
+    if (confirm("Are you sure you want to delete the customer "+$this.closest('.subs-row').find('.name').text())) {
+      e.preventDefault();
+      var sub_id = $this.closest('.subs-row').attr('data-sub-id');
+
+      if (!$this.hasClass('is-loading')) {
+        $this.addClass('is-loading');
+
+        $.ajax({
+          type: "POST",
+          url: '/delete',
+          data: {subscription_id: sub_id}
+        }).success(function(response) {
+          console.log(response);
+
+          $this.closest('.subs-row').remove();
+        });
+      }
+    }
+  });
+
+  var page = 1;
+  var search = '';
+
+  $('body').on('click', '.load-more', function(e) {
+    if (!$('.load-more').hasClass('is-loading')) {
+      $('.load-more').addClass('is-loading');
+      page++;
+
+      console.log(search);
+
+      $.ajax({
+        type: "GET",
+        url: '/subscription_page',
+        data: {
+          page: page,
+          search: search
+        }
+      }).success(function(pagination) {
+        console.log(pagination);
+        $('.load-more').removeClass('is-loading');
+        $('.subscriptions').append(pagination.html);
+
+        if (pagination.load_more) {
+          $('.load-more').show();
+        } else {
+          $('.load-more').hide();
+        }
+      });
+    }
+  });
+
+  $('body').on('click', '.search', function(e) {
+    if (!$('.search').hasClass('is-loading')) {
+      $('.search').addClass('is-loading')
+
+      page = 1;
+      search = $('.search-input').val();
+
+      $.ajax({
+        type: "GET",
+        url: '/subscription_page',
+        data: {
+          page: page,
+          search: search
+        }
+      }).success(function(pagination) {
+        console.log(pagination);
+        $('.search').removeClass('is-loading')
+        $('.subscriptions .subs-row').remove();
+        $('.subscriptions').append(pagination.html);
+
+        if (pagination.load_more) {
+          $('.load-more').show();
+        } else {
+          $('.load-more').hide();
+        }
       });
     }
   });

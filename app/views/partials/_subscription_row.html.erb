@@ -1,0 +1,22 @@
+<div data-sub-id="<%= subscription.id %>" class="subs-row clearfix <% if subscription.email %>email<% else %>no-email<% end %>">
+  <ul>
+    <li class="sub-number"><%= subscription.id %></li>
+    <li class="name"><span class="first"><%= subscription.first_name %></span> <span class="last"><%= subscription.last_name %></span></li>
+    <li class="email"><%= dash_if_empty subscription.email %></li>
+    <li class="product"><%= get_product_name subscription.product %></li>
+    <li class="amount"><%= dash_if_empty money subscription.amount %></li>
+    <li class="cc_number">-<%= subscription.cc_number %></li>
+    <li class="sub-date"><%= subscription.created_at&.in_time_zone("Eastern Time (US & Canada)")&.strftime('%-m/%-d/%y, %l:%M%P') %></li>
+    <li class="edit-delete">
+      <a href="" class="button-edit" title="Edit">
+        <%= image_tag("edit.png") %>
+      </a>
+      <a href="" class="button-edit-save" title="Save" style="display:none;">
+        <%= image_tag("save.png") %>
+      </a>
+      <a href="" class="button-delete" title="Delete">
+        <%= image_tag("delete.png") %>
+      </a>
+    </li><!-- .edit-delete -->
+  </ul>
+</div><!-- .subs-row -->

@@ -98,6 +98,10 @@ button.load-more {
   position: relative;
   left: 50%;
   transform: translateX(-50%);
+
+  &.is-loading:before {
+    border-color: #fff;
+  }
 }
 button:focus {
   outline: none;
@@ -163,6 +167,12 @@ hr {
 .subs-row, .users-row { 
   border-bottom: #d8d8d8 solid 1px;
 }
+.subscriptions.hide-email .subs-row.email {
+  display: none;
+}
+.subscriptions.hide-no-email .subs-row.no-email {
+  display: none;
+}
 .subscriptions .subs-row:nth-child(2n),
 .users .users-row:nth-child(2n) {
   background: #fff;
@@ -209,8 +219,8 @@ hr {
 }
 .edit-delete {
   display: flex !important;
-    align-items: center;
-    justify-content: space-evenly;
+  align-items: center;
+  justify-content: space-evenly;
 }
 .edit-delete a:hover {
   opacity: .7;
@@ -221,36 +231,36 @@ hr {
 
 /***** FONTS *****/
 
-@font-face {
-    font-family: museo-sans;
-    src: url('assets/fonts/MuseoSans-300.eot');
-    src: url('assets/fonts/MuseoSans-300.eot?#iefix') format('embedded-opentype'),
-        url('assets/fonts/MuseoSans-300.woff2') format('woff2'),
-        url('assets/fonts/MuseoSans-300.woff') format('woff'),
-        url('assets/fonts/MuseoSans-300.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-}
-@font-face {
-    font-family: museo-sans;
-    src: url('assets/fonts/MuseoSans-500.eot');
-    src: url('assets/fonts/MuseoSans-500.eot?#iefix') format('embedded-opentype'),
-        url('assets/fonts/MuseoSans-500.woff2') format('woff2'),
-        url('assets/fonts/MuseoSans-500.woff') format('woff'),
-        url('assets/fonts/MuseoSans-500.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
-}
-@font-face {
-    font-family: museo-sans;
-    src: url('assets/fonts/MuseoSans-700.eot');
-    src: url('assets/fonts/MuseoSans-700.eot?#iefix') format('embedded-opentype'),
-        url('assets/fonts/MuseoSans-700.woff2') format('woff2'),
-        url('assets/fonts/MuseoSans-700.woff') format('woff'),
-        url('assets/fonts/MuseoSans-700.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-}
+// @font-face {
+//     font-family: museo-sans;
+//     src: url('assets/fonts/MuseoSans-300.eot');
+//     src: url('assets/fonts/MuseoSans-300.eot?#iefix') format('embedded-opentype'),
+//         url('assets/fonts/MuseoSans-300.woff2') format('woff2'),
+//         url('assets/fonts/MuseoSans-300.woff') format('woff'),
+//         url('assets/fonts/MuseoSans-300.ttf') format('truetype');
+//     font-weight: 300;
+//     font-style: normal;
+// }
+// @font-face {
+//     font-family: museo-sans;
+//     src: url('assets/fonts/MuseoSans-500.eot');
+//     src: url('assets/fonts/MuseoSans-500.eot?#iefix') format('embedded-opentype'),
+//         url('assets/fonts/MuseoSans-500.woff2') format('woff2'),
+//         url('assets/fonts/MuseoSans-500.woff') format('woff'),
+//         url('assets/fonts/MuseoSans-500.ttf') format('truetype');
+//     font-weight: 500;
+//     font-style: normal;
+// }
+// @font-face {
+//     font-family: museo-sans;
+//     src: url('assets/fonts/MuseoSans-700.eot');
+//     src: url('assets/fonts/MuseoSans-700.eot?#iefix') format('embedded-opentype'),
+//         url('assets/fonts/MuseoSans-700.woff2') format('woff2'),
+//         url('assets/fonts/MuseoSans-700.woff') format('woff'),
+//         url('assets/fonts/MuseoSans-700.ttf') format('truetype');
+//     font-weight: 700;
+//     font-style: normal;
+// }
 
 /***** END FONTS *****/
 
@@ -872,7 +882,7 @@ button.details:hover {
   &:before {
     // background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2020%2020%22%3E%3Cstyle%20type=%22text/css%22%3Ecircle,ellipse,line,path,polygon,polyline,rect,text%7Bfill:white%20!important;%20%7D%3C/style%3E%3Cpath%20d=%22M6.876%200.267c-3.956%201.419-6.649%205.184-6.649%209.459%200%205.548%204.492%2010.046%2010.034%2010.046%204.297%200%208.075-2.729%209.473-6.724%200.124-0.355-0.063-0.744-0.418-0.869s-0.744%200.063-0.869%200.418c-1.208%203.452-4.473%205.811-8.186%205.811-4.789%200-8.671-3.887-8.671-8.682%200-3.696%202.327-6.95%205.745-8.176%200.354-0.127%200.539-0.518%200.412-0.872s-0.518-0.539-0.872-0.412z%22/%3E%3C/svg%3E");
     content: '' !important;
-    border: 1px solid #fff;
+    border: 1px solid #83b97b;
     border-right: 0;
     border-bottom: 0;
     border-radius: 50%;
@@ -985,6 +995,43 @@ button.details {
 
 .button-delete.is-loading:before {
   border-color: #83b97b;
+}
+
+.subscriptions .subs-row {
+  .single-subscription-field {
+    font-size: 15px;
+    padding: 5px 15px;
+    margin: -4px auto;
+    width: 90%;
+
+    &+ .single-subscription-field {
+      margin-top: 10px;
+    }
+  }
+}
+
+.log-accordion-details ul:first-child {
+  margin-top: 0;
+}
+
+.subscription-page {
+  .errors-row {
+    padding: 50px 0 0;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      padding-right: 25px;
+
+      li {
+        border: none;
+        display: inline;
+        float: left;
+        font-weight: 500;
+      }
+    }
+  }
 }
 
 /***** END MY CSS *****/

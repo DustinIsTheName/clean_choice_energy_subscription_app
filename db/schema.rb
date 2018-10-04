@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20181001200047) do
+ActiveRecord::Schema.define(version: 20181004204431) do
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer  "priority",   default: 0, null: false
@@ -58,20 +58,22 @@ ActiveRecord::Schema.define(version: 20181001200047) do
     t.string   "external_customer_id"
     t.integer  "job_id"
     t.integer  "amount"
+    t.string   "full_name"
   end
 
   create_table "transactions", force: :cascade do |t|
     t.string   "name"
     t.string   "email"
-    t.integer  "product",     limit: 8
+    t.integer  "product",         limit: 8
     t.integer  "amount"
     t.string   "cc_number"
     t.boolean  "status"
     t.text     "error_codes"
     t.integer  "import_id"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
     t.boolean  "no_retry"
+    t.integer  "subscription_id"
   end
 
   create_table "users", force: :cascade do |t|

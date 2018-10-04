@@ -1,17 +1,11 @@
 class InternalSubscription
-  def create(row, import)
+  def self.create(row, import, subscription, product)
 
     transaction = Transaction.new
-    subscription = Subscription.find_by({first_name: row["First Name"]&.strip, last_name: row["Last Name"]&.strip, cc_number: row["Credit Card #"].to_s.strip.slice(-4,4)})
     error_codes = []
 
-    transaction.no_retry = false
-    unless row["Subscription Product"].blank?
-      begin
-        product = ShopifyAPI::Product.find(row["Subscription Product"])
-      rescue => e
-        error_codes << 'Product not found'
-      end
+    unless product
+      error_codes << 'Product not found'
     end
 
     puts subscription
@@ -99,7 +93,7 @@ class InternalSubscription
             "billing_phone": "1-800-555-1234"
           }
 
-          recharge_customer = recharge_http_request(url, customer_params)
+          recharge_customer = recharge_http_request(url, customer_params, 'post')
 
           puts Colorize.bright('recharge_customer')
           puts Colorize.bright(recharge_customer)
@@ -125,7 +119,7 @@ class InternalSubscription
             end
           end
 
-          recharge_address = recharge_http_request(url, address_params)
+          recharge_address = recharge_http_request(url, address_params, 'post')
 
           if recharge_address["errors"]
             recharge_address["errors"].each do |error_message|
@@ -196,7 +190,7 @@ class InternalSubscription
               "stripe_customer_token": stripe_customer.id
             }
 
-            recharge_subscription = recharge_http_request(url, subscription_params)
+            recharge_subscription = recharge_http_request(url, subscription_params, 'post')
 
             if recharge_subscription["errors"]
               recharge_subscription["errors"].each do |error_message|
@@ -243,8 +237,13 @@ class InternalSubscription
     end
 
     ######### Email Field
-    transaction.email = row["Email"]
-    subscription.email = row["Email"]
+    if row["Email"].blank?
+      transaction.email = nil
+      subscription.email = nil
+    else
+      transaction.email = row["Email"]
+      subscription.email = row["Email"]
+    end
 
     ######### Product Info Fields
     if product
@@ -268,12 +267,12 @@ class InternalSubscription
     ######### Import Relation
     transaction.import_id = import.id
 
-    if stripe_customer
-      subscription.external_customer_id = stripe_customer.id
-    elsif recharge_customer
+    if recharge_customer
       if recharge_customer["customer"]
         subscription.external_customer_id = recharge_customer["customer"]["id"]
       end
+    elsif stripe_customer
+      subscription.external_customer_id = stripe_customer.id
     end
 
     if stripe_subscription
@@ -321,6 +320,21 @@ class InternalSubscription
     ################################################################################
     if error_codes.size > 0
       transaction.status = false
+
+      if recharge_customer and recharge_customer["customer"]
+        puts recharge_customer
+        puts Colorize.red('stripe_customer delete')
+        url = URI("https://api.rechargeapps.com/customers/#{recharge_customer["customer"]["id"]}")
+        recharge_http_request(url, "{\n\n}", "delete")
+        # qw12
+      end
+
+      if stripe_customer
+        puts stripe_customer
+        puts Colorize.red('stripe_customer delete')
+        stripe_customer.delete
+      end
+
       puts Colorize.red('errors present, so skip saving subscription')
     else
       ################################################################################
@@ -329,6 +343,7 @@ class InternalSubscription
       if subscription.save
         ######### Set Transaction Status
         transaction.status = true
+        transaction.subscription_id = subscription.id
         puts Colorize.green('subscription saved')
 
         if subscription.payment_service == 'stripe'
@@ -340,6 +355,21 @@ class InternalSubscription
         subscription.errors.messages.each do |error_message|
           error_codes << (error_message.first.to_s << ' ' << error_message.last.first)
         end
+
+        if recharge_customer and recharge_customer["customer"]
+          puts recharge_customer
+          puts Colorize.red('stripe_customer delete')
+          url = URI("https://api.rechargeapps.com/customers/#{recharge_customer["customer"]["id"]}")
+          recharge_http_request(url, "{\n\n}", "delete")
+          # qw12
+        end
+
+        if stripe_customer
+          puts stripe_customer
+          puts Colorize.red('stripe_customer delete')
+          stripe_customer.delete
+        end
+        
         puts Colorize.red('subscription error')
       end
     end
@@ -354,14 +384,42 @@ class InternalSubscription
     ################################################################################
     if transaction.save
       puts Colorize.green('transaction saved')
+      return transaction
     else
       puts Colorize.red('transaction error')
     end
-
-    event_lines << {
-      successful: transaction.status,
-      text: "##{transaction.id} - #{transaction.name} - #{transaction.email} - #{product&.title} - $#{product&.variants&.first&.price} - #{transaction.cc_number}"
-    }
-
   end
+
+  private
+
+    def self.recharge_http_request(url, body = nil, type = nil)
+      http = Net::HTTP.new(url.host, url.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+
+      if type == "delete"
+        request = Net::HTTP::Delete.new(url)
+      elsif type == "post"
+        request = Net::HTTP::Post.new(url)
+      elsif type == "get"
+        request = Net::HTTP::Get.new(url)
+      else
+        request = Net::HTTP::Get.new(url)
+      end
+
+      request["x-recharge-access-token"] = ENV['RECHARGE_API_KEY']
+      request["content-type"] = 'application/json'
+
+      if body
+        request.body = body.to_json
+      end
+
+      response = http.request(request)
+
+      puts Colorize.yellow(request.body)
+      puts Colorize.yellow(response.code)
+
+      JSON.parse response.read_body
+    end
+
 end
