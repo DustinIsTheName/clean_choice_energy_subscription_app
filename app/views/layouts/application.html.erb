@@ -16,9 +16,26 @@
       <%= render partial: '/partials/header' %>
     <% end %>
 
-<!--     <p class="notice"><%= notice %></p>
+    <!-- <p class="notice"><%= notice %></p>
     <p class="alert"><%= alert %></p> -->
 
     <%= yield %>
+
+    <% if current_user.present? %>
+    <script>
+    window.onbeforeunload = closingCode;
+    function closingCode() {
+      console.log('VVVVVVVV');
+      $.ajax({
+        type: "DELETE",
+        url: '/users/sign_out'
+      }).success(function(test) {
+        console.log(test);
+      }).error(function(error) {
+        console.log(error);
+      });
+    }
+    </script>
+    <% end %>
   </body>
 </html>

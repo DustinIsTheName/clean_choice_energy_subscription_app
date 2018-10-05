@@ -906,7 +906,8 @@ button.details:hover {
 html {
   height: 100%;
 }
-body.devise-sessions-new {
+body.devise-sessions-new,
+body.sessions-new {
   height: 100%;
 }
 .notice,

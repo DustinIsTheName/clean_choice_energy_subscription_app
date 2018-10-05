@@ -9,7 +9,7 @@
           <li><%= active_link_to 'Import', import_path %></li>
         <% end %>
         <% if current_user.access == "customer_care" or current_user.access == "admin" %>
-          <li><%= active_link_to 'Subscriptions', subscription_path %></li>
+          <li><%= active_link_to 'Subscriptions', subscriptions_path %></li>
         <% end %>
         <li><%= active_link_to 'Log', log_path %></li>
         <% if current_user.access == "admin" %>

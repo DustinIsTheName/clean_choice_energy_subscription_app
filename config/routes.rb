@@ -1,12 +1,12 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, controllers: {sessions: "sessions"}
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
   root to: "pages#import"
 
   controller :pages do
     get 'import' => :import
-    get 'subscription' => :subscription
+    get 'subscriptions' => :subscription
     get 'subscription_page' => :subscription_page
     get 'log' => :log
     get 'users' => :users

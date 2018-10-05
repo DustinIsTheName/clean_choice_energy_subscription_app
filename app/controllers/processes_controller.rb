@@ -238,6 +238,8 @@ class ProcessesController < ApplicationController
 
     end
 
+    # ProcessMailer.subscription_canceled(subscription).deliver
+
     subscription.destroy
 
     ################################################################################
