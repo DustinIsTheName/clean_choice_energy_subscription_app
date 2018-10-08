@@ -1,33 +1,26 @@
 <% email_title = 'Your subscription has been canceled' %>
-<% email_body = 'We\’re so sorry to see you go and hope we will have an opportunity to serve you again.' %>
+<% email_body = "We’re so sorry to see you go and hope we will have an opportunity to serve you again." %>
 
     <table class="body">
       <tr>
         <td>
           <table class="header row">
             <tr>
-              <td class="header__cell">
-                <center>
+              <td class="header__cell" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;">
 
-                  <table class="container">
+                  <table class="container" style="width: 560px; text-align: left; border-spacing: 0; border-collapse: collapse; margin: 0 auto;">
                     <tr>
-                      <td>
+                      <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;">
 
-                        <table class="row">
+                        <table class="row" style="width: 100%; border-spacing: 0; border-collapse: collapse;">
                           <tr>
-                            <td class="shop-name__cell">
-                              {%- if shop.email_logo_url %}
-                                <img src="{{shop.email_logo_url}}" alt="<%= @shop.name %>" width="{{ shop.email_logo_width }}">
-                              {%- else %}
-                                <h1 class="shop-name__text">
-                                  <a href="<%= @shop.domain %>"><%= @shop.name %></a>
-                                </h1>
-                              {%- endif %}
+                            <td class="shop-name__cell" style="display: block;">
+                              <%= image_tag "cce-logo.png", alt: "CleanChoice Energy", width: 250 %>
                             </td>
 
-                            <td class="order-number__cell">
-                              <span class="order-number__text">
-                                Order {{ order_name }}
+                            <td class="order-number__cell" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; text-transform: uppercase; font-size: 14px; color: #999; display: block;">
+                              <span class="order-number__text" style="font-size: 16px;">
+                                Subscription <%= @subscription.id %>
                               </span>
                             </td>
                           </tr>
@@ -37,7 +30,6 @@
                     </tr>
                   </table>
 
-                </center>
               </td>
             </tr>
           </table>
@@ -49,9 +41,9 @@
                   <table class="container">
                     <tr>
                       <td>
-                        
-                      <h2>{{ email_title }}</h2>
-                      <p>{{ email_body }}</p>
+
+                      <h2><%= email_title %></h2>
+                      <p><%= email_body %></p>
 
                       </td>
                     </tr>
@@ -61,14 +53,13 @@
             </tr>
           </table>
 
-          <table class="row section">
+          <table class="row section" style="width: 100%; border-spacing: 0; border-collapse: collapse; border-top-width: 1px; border-top-color: #e5e5e5; border-top-style: solid;">
   <tr>
-    <td class="section__cell">
-      <center>
+    <td class="section__cell" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; padding: 40px 0;">
         <table class="container">
           <tr>
             <td>
-              <h3>Refunded Items</h3>
+              <h3>Canceled Items</h3>
             </td>
           </tr>
         </table>
@@ -78,54 +69,39 @@
               
             
 <table class="row">
-  {% for line in subtotal_line_items %}
+
   <tr class="order-list__item">
     <td class="order-list__item__cell">
       <table>
-        <td>
-          {% if line.image %}
-            <img src="{{ line | img_url: 'compact_cropped' }}" align="left" width="60" height="60" class="order-list__product-image"/>
-          {% endif %}
+        <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;">
+          <% if @product.image %>
+            <img src="<%= @product.image.src %>" align="left" width="60" height="60" class="order-list__product-image" style="margin-right: 15px;border-radius: 8px;border: 1px solid #e5e5e5;"/>
+          <% end %>
         </td>
         <td class="order-list__product-description-cell">
-          {% if line.product.title %}
-            {% assign line_title = line.product.title %}
-          {% else %}
-            {% assign line_title = line.title %}
-          {% endif %}
-
-          {% if line.quantity < line.quantity %}
-            {% capture line_display %} {{ line.quantity }} of {{ line.quantity }} {% endcapture %}
-          {% else %}
-            {% assign line_display = line.quantity  %}
-          {% endif %}
-
-          <span class="order-list__item-title">{{ line_title }} × {{ line_display }}</span><br/>
-
-          {% if line.variant.title != 'Default Title' %}
-            <span class="order-list__item-variant">{{ line.variant.title }}</span><br/>
-          {% endif %}
-
-          {% if line.refunded_quantity > 0 %}
-            <span class="order-list__item-refunded">Refunded</span>
-          {% endif %}
+          <span class="order-list__item-title" style="font-size: 16px; font-weight: 600; line-height: 1.4; color: #555;"><%= @product.title %></span><br/>
         </td>
+          <% if false %>
           <td class="order-list__price-cell">
             {% if line.original_line_price != line.line_price %}
               <del class="order-list__item-original-price">{{ line.original_line_price | money }}</del>
             {% endif %}
             <p class="order-list__item-price">{{ line.line_price | money }}</p>
           </td>
+          <% end %>
       </table>
     </td>
-  </tr>{% endfor %}
+  </tr>
 </table>
 
+<% if false %>
             <table class="row subtotal-lines">
   <tr>
     <td class="subtotal-spacer"></td>
     <td>
       <table class="row subtotal-table">
+
+        
         {% if discounts %}
           {% capture discount_title %}
             {% if discounts.first.code %}
@@ -146,7 +122,7 @@
   </td>
 </tr>
 
-        {% endif %}
+        
 
         
 <tr class="subtotal-line">
@@ -281,25 +257,23 @@
     </td>
   </tr>
 </table>
-
+<% end %>
 
             </td>
           </tr>
         </table>
-      </center>
     </td>
   </tr>
 </table>
 
-          <table class="row footer">
+          <table class="row footer" style="width: 100%;border-spacing: 0;border-collapse: collapse;border-top-width: 1px;border-top-color: #e5e5e5;border-top-style: solid;">
   <tr>
-    <td class="footer__cell">
+    <td class="footer__cell" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; padding: 35px 0;">
       <center>
-        <table class="container">
+        <table class="container" style="width: 560px; text-align: left; border-spacing: 0; border-collapse: collapse; margin: 0 auto;">
           <tr>
-            <td>
-              
-              <p class="disclaimer__subtext">If you have any questions, reply to this email or contact us at <a href="mailto:{{ shop.email }}">{{ shop.email }}</a></p>
+            <td style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;">
+              <p class="disclaimer__subtext" style="color: #999; line-height: 150%; font-size: 14px; margin: 0;">If you have any questions, reply to this email or contact us at <a href="mailto:support@cleanchoiceenergy.com">support@cleanchoiceenergy.com</a></p>
             </td>
           </tr>
         </table>
