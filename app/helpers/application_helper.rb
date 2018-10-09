@@ -56,4 +56,16 @@ module ApplicationHelper
 
     ApplicationController.new.render_to_string(partial: '/partials/subscription_row', locals: {subscription: subscription})
   end
+
+  def empty_user_row
+    user = User.new({
+      id: '',
+      first_name: '',
+      last_name: '',
+      email: '',
+      access: ''
+    })
+
+    ApplicationController.new.render_to_string(partial: '/partials/user_row', locals: {user: user})
+  end
 end

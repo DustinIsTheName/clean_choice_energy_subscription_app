@@ -1,5 +1,7 @@
 class ProcessesController < ApplicationController
 
+  skip_before_filter :verify_authenticity_token, :only => [:recharge_delete_subscription, :recharge_delete_customer, :stripe_delete]
+
   def import
     Stripe.api_key = CURRENT_STRIPE_SECRET_KEY
 
@@ -232,13 +234,13 @@ class ProcessesController < ApplicationController
           stripe_customer.delete
         end
 
+        ProcessMailer.subscription_canceled(subscription).deliver
+
       rescue => e
         puts e
       end
 
     end
-
-    ProcessMailer.subscription_canceled(subscription).deliver
 
     subscription.destroy
 
@@ -260,8 +262,144 @@ class ProcessesController < ApplicationController
       subscription: subscription,
       recharge_customer: recharge_customer,
       stripe_customer: stripe_customer,
-
     }
+  end
+
+  def add_user
+
+    puts Colorize.cyan(params)
+
+    if params["user"]["password"] == params["user"]["confirm_password"]
+      user = User.create({
+        first_name: params["user"]["first_name"],
+        last_name: params["user"]["last_name"],
+        email: params["user"]["email"],
+        access: params["user"]["access"],
+        password: params["user"]["password"]
+      })
+
+      if user.save
+        puts Colorize.green('User saved')
+        render json: user
+      else
+        puts Colorize.red('User error')
+        puts Colorize.red(user.errors.messages)
+        render json: {errors: user.errors}
+      end
+    else
+      render json: {errors: {passwords: ["don't match"]}}
+    end
+
+  end
+
+  def edit_user
+    puts Colorize.cyan(params)
+
+    user = User.find(params[:user_id])
+    user.first_name = params["first_name"]
+    user.last_name = params["last_name"]
+    user.email = params["email"]
+    user.access = params["access"]
+
+    if user.save
+      puts Colorize.green('updated User')
+    else
+      puts Colorize.red('error updating User')
+    end
+
+    render json: user
+  end
+
+  def delete_user
+    puts Colorize.cyan(params)
+
+    user = User.find(params[:user_id])
+    user.destroy
+
+    render json: user
+  end
+
+  def recharge_delete_subscription
+    puts Colorize.cyan(params)
+
+    subscription = Subscription.find_by_external_id(params["subscription"]["id"])
+
+    if subscription
+
+      url = URI("https://api.rechargeapps.com/customers/#{subscription.external_customer_id}")
+      sub_url = URI("https://api.rechargeapps.com/subscriptions/#{subscription.external_id}")
+
+      recharge_customer = recharge_http_request(url)
+      recharge_subscription = recharge_http_request(sub_url)
+
+      puts Colorize.blue(subscription.external_customer_id)
+      puts Colorize.orange(recharge_customer)
+      puts Colorize.yellow(recharge_subscription)
+
+      if recharge_customer["customer"] and recharge_subscription["subscription"]
+        puts Colorize.yellow('in recharge_customer deletion')
+        # stripe_customer = Stripe::Customer.retrieve(recharge_customer["stripe_customer_token"])
+
+        # if stripe_customer 
+        #   stripe_customer.delete
+        # end
+
+        puts recharge_http_request(sub_url, "{\n\n}", "delete")
+        puts recharge_http_request(url, "{\n\n}", "delete")
+
+      else
+        puts Colorize.yellow('NOT!!!')
+      end
+
+      subscription.destroy
+    end
+
+
+  end
+
+  def recharge_delete_customer
+    puts Colorize.magenta(params)
+
+    subscription = Subscription.find_by_external_customer_id(params["customer"]["id"])
+
+    if subscription
+      url = URI("https://api.rechargeapps.com/customers/#{subscription.external_customer_id}")
+      sub_url = URI("https://api.rechargeapps.com/subscriptions/#{subscription.external_id}")
+
+      recharge_customer = recharge_http_request(url)
+      recharge_subscription = recharge_http_request(sub_url)
+
+      puts Colorize.blue(subscription.external_customer_id)
+      puts Colorize.orange(recharge_customer)
+      puts Colorize.yellow(recharge_subscription)
+
+      if recharge_customer["customer"] and recharge_subscription["subscription"]
+        puts Colorize.yellow('in recharge_customer deletion')
+        # stripe_customer = Stripe::Customer.retrieve(recharge_customer["stripe_customer_token"])
+
+        # if stripe_customer 
+        #   stripe_customer.delete
+        # end
+
+        puts recharge_http_request(sub_url, "{\n\n}", "delete")
+        puts recharge_http_request(url, "{\n\n}", "delete")
+
+      else
+        puts Colorize.yellow('NOT!!!')
+      end
+    end
+  end
+
+  def stripe_delete
+    puts Colorize.green(params)
+
+    subscription = Subscription.find_by_external_customer_id(params["data"]["object"]["id"])
+
+    if subscription
+      subscription.destroy
+    end
+
+    head :ok, content_type: "text/html"
   end
 
   def download
@@ -300,6 +438,24 @@ class ProcessesController < ApplicationController
       puts Colorize.yellow(response.code)
 
       JSON.parse response.read_body
+    end
+
+    def isWebhookValid()    
+      secret = '< secret client token here >'
+      body = '< request body here >'
+      recieved_digest = '< Hmac-Sha256 value from webhook response header here >'
+
+      calculated_digest = Digest::SHA256.hexdigest(secret+body)
+
+      print(calculated_digest +"\n")
+      print(recieved_digest +"\n\n")
+      if calculated_digest == recieved_digest
+        print("VALIDATION SUCCESS!\n")
+        return true
+      else
+        print("Oops! There may be some third party interference going on.\n")
+        return false
+      end
     end
 
 end

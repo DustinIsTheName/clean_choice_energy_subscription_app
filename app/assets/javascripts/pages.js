@@ -261,6 +261,8 @@ function ready() {
 
   });
 
+  /***** Subscriptions PAGE *****/
+
   $('#reveal-add-single-subscription').click(function() {
     $('.add-container').slideToggle();
   });
@@ -273,8 +275,6 @@ function ready() {
 
     $('.subscriptions').removeClass('hide-email hide-no-email');
     $('.subscriptions').addClass(filter);
-
-
   });
 
   $('#add-single-subscription').click(function() {
@@ -514,6 +514,181 @@ function ready() {
           } else {
             $('.load-more').hide();
           }
+        });
+      }
+    }
+  });
+
+  /***** USERS PAGE *****/
+
+  $('#reveal-add-user').click(function() {
+    $('.add-container').slideToggle();
+  });
+
+  $('#add-user').click(function() {
+    var user = {}
+
+    $('#add-user').addClass('is-loading');
+
+    $('.single-user-field').each(function() {
+      user[$(this).attr('name')] = $(this).val();
+    });
+
+    $.ajax({
+      type: "POST",
+      url: '/user',
+      data: {user: user}
+    }).success(function(user) {
+      console.log(user);
+
+      $('.errors-row').remove();
+     
+      if (user.errors) {
+
+        html = '<div class="errors-row clearfix">';
+        html +=   '<div class="errors-bar align-left">';
+        html +=     '<div class="errors-title">Error Code(s)</div>';
+        html +=     '<div class="errors-list">';
+        html +=       '<ul class="clearfix">';
+        for (key in user.errors) {
+        html +=         '<li>'+key+' '+user.errors[key][0]+'</li>';
+        }
+        html +=       '</ul>';
+        html +=     '</div>';
+        html +=   '</div>';
+        html += '</div>';
+
+        $('.add-container').append(html);
+        console.log(user);
+      } else {
+
+        var $emptyRow = $($('.user-page').data('empty-user-row'));
+        var $newRow = $emptyRow.clone();
+
+        $newRow.attr('data-user-id', user.id);
+        $newRow.find('.users-number').text(user.id);
+        $newRow.find('.users-name').text(user.first_name + ' ' + user.last_name);
+        $newRow.find('.users-email').text(user.email);
+        $newRow.find('.users-access').text(user.access);
+
+        console.log(user);
+
+        $('.user-page .users').append($newRow);
+      }
+
+      $('#add-user').removeClass('is-loading');
+    });
+  });
+
+  $('body').on('click', '.button-user-edit', function(e) {
+    console.log('yyyyyyy')
+    e.preventDefault();
+    var $userRow = $(this).closest('.users-row');
+    var firstName = $userRow.find('.users-name .first').text();
+    var lastName = $userRow.find('.users-name .last').text();
+    var email = $userRow.find('.users-email').text();
+    var access = $userRow.find('.users-access').text().toLowerCase().split(' ').join('_');
+
+    if (!firstName || !lastName) {
+      var nameArray = $userRow.find('.users-name').text().split(' ');
+      lastName = nameArray.pop();
+      firstName = nameArray.join(' ');
+    }
+
+    if (email === '-') {
+      email = '';
+    }
+    var $this = $(this);
+
+    console.log(access)
+
+    var access_html = '<select name="access" class="single-user-field">';
+    if (access == 'admin') {
+      access_html += '<option selected="true" value="admin">Admin</option>';
+    } else {
+      access_html += '<option value="admin">Admin</option>';
+    }
+    if (access == 'customer_care') {
+      access_html += '<option selected="true" value="customer_care">Customer Care</option>';
+    } else {
+      access_html += '<option value="customer_care">Customer Care</option>';
+    }
+    if (access == 'importer') {
+      access_html += '<option selected="true" value="importer">Importer</option>';
+    } else {
+      access_html += '<option value="importer">Importer</option>';
+    }
+    access_html += '</select>';
+
+    $userRow.find('.button-user-edit').hide();
+    $userRow.find('.button-user-delete').hide();
+    $userRow.find('.button-user-edit-save').show();
+
+
+    $userRow.find('.users-name').html('<input class="single-user-field" name="first-name" placeholder="First Name" value="'+firstName+'"><input class="single-user-field" name="last-name" placeholder="Last Name" value="'+lastName+'">');
+    $userRow.find('.users-email').html('<input class="single-user-field" name="email" placeholder="Email" value="'+email+'">');
+
+    $userRow.find('.users-access').addClass('edit').html(access_html);
+  });
+
+
+
+  $('body').on('click', '.button-user-edit-save', function(e) {
+    e.preventDefault();
+    var $userRow = $(this).closest('.users-row');
+
+    if (!$userRow.find('.button-user-edit-save').hasClass('is-loading')) {
+      $userRow.find('.button-user-edit-save').addClass('is-loading');
+      var user_id = $userRow.attr('data-user-id');
+
+      $.ajax({
+        type: "POST",
+        url: '/edit-user',
+        data: {
+          user_id: user_id,
+          first_name: $userRow.find('[name="first-name"]').val(),
+          last_name: $userRow.find('[name="last-name"]').val(),
+          email: $userRow.find('[name="email"]').val(),
+          access: $userRow.find('[name="access"]').val()
+        }
+      }).success(function(response) {
+        console.log(response);
+
+        String.prototype.capitalize = function() {
+          return this.charAt(0).toUpperCase() + this.slice(1);
+        }
+
+        $userRow.find('.button-user-edit-save').removeClass('is-loading').hide();
+        $userRow.find('.button-user-delete').show();
+        $userRow.find('.button-user-edit').show();
+        $userRow.find('.users-name').html('<span class="first">'+response.first_name+'</span> <span class="last">'+response.last_name+'</span>');
+        $userRow.find('.users-email').html(response.email);
+        $userRow.find('.users-access').removeClass('edit').html(response.access.capitalize().split('_').join(' '));
+      });
+    }
+  });
+
+
+
+
+  $('body').on('click', '.button-user-delete', function(e) {
+    var $this = $(this);
+
+    if (confirm("Are you sure you want to delete this user "+$this.closest('.subs-row').find('.users-name').text())) {
+      e.preventDefault();
+      var usr_id = $this.closest('.users-row').attr('data-user-id');
+
+      if (!$this.hasClass('is-loading')) {
+        $this.addClass('is-loading');
+
+        $.ajax({
+          type: "POST",
+          url: '/delete-user',
+          data: {user_id: usr_id}
+        }).success(function(response) {
+          console.log(response);
+
+          $this.closest('.users-row').remove();
         });
       }
     }

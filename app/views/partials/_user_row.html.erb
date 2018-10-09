@@ -1,0 +1,19 @@
+<div class="users-row clearfix" data-user-id="<%= user.id %>">
+  <ul class="clearfix">
+    <li class="users-number"><%= user.id %></li>
+    <li class="users-name"><span class="first"><%= user.first_name %></span> <span class="last"><%= user.last_name %></span></li>
+    <li class="users-email"><%= user.email %></li>
+    <li class="users-access"><%= user.access.split('_').map{|u| u.capitalize}.join(' ') %></li>
+    <li class="edit-delete">
+      <a href="" class="button-user-edit">
+        <%= image_tag("edit.png") %>
+      </a>
+      <a href="" class="button-user-edit-save" title="Save" style="display:none;">
+        <%= image_tag("save.png") %>
+      </a>
+      <a href="" class="button-user-delete">
+        <%= image_tag("delete.png") %> 
+      </a>
+    </li><!-- .edit-delete -->
+  </ul>
+</div><!-- .users-row -->

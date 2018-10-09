@@ -1,9 +1,49 @@
 <% if current_user.access == "admin" %>
-  <div class="page-content">
+  <div class="page-content user-page" data-empty-user-row="<%= empty_user_row.gsub("\n", " ") %>">
+    <div class="container page-title-container">
+      <div class="page-title align-left">Users</div>
+      <button id="reveal-add-user" class="align-right">Add User</button>
+    </div><!-- .container -->
     <div class="container">
-      <div class="page-title">Users Coming Soon</div>
-    </div> 
-  </div>
+      <div class="add-container clearfix" style="display: none;">
+        <div class="add-title">Add a New User</div>
+        <div class="add-user-form clearfix">
+          <div class="add-user-fields align-left">
+            <input type="text" class="single-user-field" name="first_name" placeholder="First Name" />
+            <input type="text" class="single-user-field" name="last_name" placeholder="Last Name" />
+            <input type="email" class="single-user-field" name="email" placeholder="Email Address" />
+            <input type="password" class="single-user-field" name="password" placeholder="Password" />
+            <input type="password" class="single-user-field" name="confirm_password" placeholder="Confirm Password" />
+            <div class="dropdown">
+              <select name="access" class="single-user-field">
+                <option selected="true" name="access" disabled="disabled">Access</option>
+                <option value="admin">Admin</option>
+                <option value="customer_care">Customer Care</option>
+                <option value="importer">Importer</option>
+              </select>
+            </div><!-- .dropdown -->
+          </div><!-- .add-user-fields -->
+          <button id="add-user" class="align-right">Add</button>
+        </div><!-- .add-user-form -->
+      </div><!-- .add-container -->
+      <div class="users clearfix">
+        <div class="users-header clearfix">
+          <ul class="clearfix">
+            <li>#</li>
+            <li>Name</li>
+            <li>Email</li>
+            <li>Access</li>
+            <li></li>
+          </ul>
+        </div><!-- .users-header -->
+
+        <% for user in @users %>
+          <%= render partial: '/partials/user_row', locals: {user: user} %>
+        <% end %>
+
+      </div><!-- .users -->
+    </div><!-- .container -->
+  </div><!-- .page-content -->
 <% else %>
   <%= render partial: '/partials/permission' %>
 <% end %>

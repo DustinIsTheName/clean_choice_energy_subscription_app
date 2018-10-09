@@ -1,8 +1,6 @@
 <% if current_user.access == "customer_care" or current_user.access == "admin" %>
   
   <% if true %>
-    <% page_limit = 5 %>
-
     <div class="page-content subscription-page" data-empty-subscription-row="<%= empty_subscription_row.gsub("\n", " ") %>">
       <div class="container page-title-container">
         <div class="page-title align-left">Subscriptions</div>

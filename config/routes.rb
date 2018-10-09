@@ -17,6 +17,12 @@ Rails.application.routes.draw do
     post 'single' => :single
     post 'edit' => :edit
     post 'delete' => :delete
+    post 'user' => :add_user
+    post 'edit-user' => :edit_user
+    post 'delete-user' => :delete_user
+    post 'recharge-delete-subscription' => :recharge_delete_subscription
+    post 'recharge-delete-customer' => :recharge_delete_customer
+    post 'stripe-delete' => :stripe_delete
   end
 
   match 'download', to: 'processes#download', as: 'download', via: :get

@@ -806,15 +806,15 @@ button.details:hover {
 
 /***** USERS PAGE *****/
 
-.page-users .page-title-container button {
+.pages-users .page-title-container button {
   position: relative;
     top: 50%;
     transform: translateY(-50%);
 }
-.page-users .add-container {
+.pages-users .add-container {
   margin-bottom: 50px;
 }
-.page-users .add-title {
+.pages-users .add-title {
   margin-bottom: 50px;
 }
 .add-user-fields {
@@ -1011,11 +1011,43 @@ button.details {
   }
 }
 
+.user-page .users-row {
+  .single-user-field {
+    font-size: 15px;
+    padding: 5px 15px;
+    margin: -4px auto;
+    width: 90%;
+
+    &+ .single-user-field {
+      margin-top: 10px;
+    }
+  }
+
+  .users-access.edit {
+    position: relative;
+    
+    &:after {
+      content: "";
+      position: absolute;
+      right: 25px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid #3F94D3;
+    }
+  }
+}
+
 .log-accordion-details ul:first-child {
   margin-top: 0;
 }
 
-.subscription-page {
+.subscription-page,
+.pages-users {
   .errors-row {
     padding: 50px 0 0;
 
