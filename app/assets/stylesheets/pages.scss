@@ -641,6 +641,23 @@ button.retry-all:hover,
   width: calc(85% / 6);
   padding: 21px 0 19px;
   text-align: center;
+
+  &.email {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: calc(145% / 6);
+  }
+
+  &.amount {
+    width: calc(55% / 6);
+  }
+
+  &.cc_number {
+    width: calc(55% / 6);
+  }
+}
+.pages-subscription .subscriptions .subs-row li.email {
+  text-transform: lowercase;
 }
 .pages-subscription .subscriptions li:first-child {
   width: 5%;
@@ -1025,7 +1042,7 @@ button.details {
 
   .users-access.edit {
     position: relative;
-    
+
     &:after {
       content: "";
       position: absolute;
