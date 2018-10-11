@@ -23,7 +23,7 @@
 
     <% if current_user.present? %>
     <script>
-    window.onbeforeunload = closingCode;
+    // window.onbeforeunload = closingCode;
     function closingCode() {
       console.log('VVVVVVVV');
       $.ajax({

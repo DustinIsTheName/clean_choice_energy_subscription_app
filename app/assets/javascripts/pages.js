@@ -136,6 +136,7 @@ function ready() {
         } else {
           $('.subs-failed').parent().hide().prev().hide();
           $('.transactions-failed').hide();
+          $('.transactions-failed .transaction-sales').text('$0.00');
         }
 
         failed_transactions.forEach(function(row) {
@@ -184,6 +185,7 @@ function ready() {
         } else {
           $('.subs-success').parent().hide().prev().hide();
           $('.transactions-success').hide();
+          $('.transactions-success .transaction-sales').text('$0.00');
         }
 
         successful_transactions.forEach(function(row) {
@@ -225,31 +227,18 @@ function ready() {
       }
     }).success(function(retry) {
       console.log(retry);
+      var successful_transaction;
+      var failed_transaction;
       var $emptyRow = $($('.import-page').data('empty-transaction-row'));
       $this.removeClass('is-loading');
 
       if (retry.transaction.status) {
-        successful_transaction = retry.transaction
+        successful_transaction = retry.transaction;
       } else {
-        failed_transaction = retry.transaction
+        failed_transaction = retry.transaction;
       }
 
-      $('.subs-row').remove();
-
-      // if (failed_transactions.length) {
-      //   $('.subs-failed').parent().show().prev().show();
-
-      //   $('.transactions-failed .transaction-qty').text(failed_transactions.length + ' of ' + csv.transactions.length);
-      //   var failed_total = failed_transactions.map(function(t) {
-      //     return t.amount
-      //   }).reduce(add, 0);
-      //   // $('.transactions-failed .transaction-sales').text('$'+failed_total.toFixed(2));
-
-      //   $('.transactions-failed').show();
-      // } else {
-      //   $('.subs-failed').parent().hide().prev().hide();
-      //   $('.transactions-failed').hide();
-      // }
+      $this.closest('.subs-row').remove();
 
       if (failed_transaction) {
         var $newRow = $emptyRow.clone();
@@ -284,20 +273,14 @@ function ready() {
         $('.subscriptions.subs-failed').append($newRow);
       }
 
-      // if (successful_transactions.length) {
-      //   $('.subs-success').parent().show().prev().show();
+      if (failed_transaction) {
+        $('.subs-failed').parent().show().prev().show();
 
-      //   $('.transactions-success .transaction-qty').text(successful_transactions.length + ' of ' + csv.transactions.length);
-      //   var success_total = successful_transactions.map(function(t) {
-      //     return t.amount
-      //   }).reduce(add, 0);
-      //   // $('.transactions-success .transaction-sales').text('$'+success_total.toFixed(2));
-
-      //   $('.transactions-success').show();
-      // } else {
-      //   $('.subs-success').parent().hide().prev().hide();
-      //   $('.transactions-success').hide();
-      // }
+        $('.transactions-failed').show();
+      } else if ($('.subscriptions.subs-failed .subs-row').length === 0) {
+        $('.subs-failed').parent().hide().prev().hide();
+        $('.transactions-failed').hide();
+      }
 
       if (successful_transaction) {
         var $newRow = $emptyRow.clone();
@@ -316,7 +299,26 @@ function ready() {
         $('.import-results-container').show();
       }
 
+      if (successful_transaction) {
+        $('.subs-success').parent().show().prev().show();
 
+
+        // qw12
+        var success_total = parseFloat($('.transactions-success .transaction-sales').text().replace('$', ''))
+        success_total += successful_transaction.amount;
+        var fail_total = parseFloat($('.transactions-failed .transaction-sales').text().replace('$', ''))
+        fail_total -= successful_transaction.amount;
+
+        $('.transactions-success .transaction-qty').text($('.subscriptions.subs-success .subs-row').length + ' of ' + $('.subscriptions .subs-row').length);
+        $('.transactions-failed .transaction-qty').text($('.subscriptions.subs-failed .subs-row').length + ' of ' + $('.subscriptions .subs-row').length);
+        // var success_total = successful_transactions.map(function(t) {
+        //   return t.amount
+        // }).reduce(add, 0);
+        $('.transactions-failed .transaction-sales').text('$'+fail_total.toFixed(2));
+        $('.transactions-success .transaction-sales').text('$'+success_total.toFixed(2));
+
+        $('.transactions-success').show();
+      }
 
 
 

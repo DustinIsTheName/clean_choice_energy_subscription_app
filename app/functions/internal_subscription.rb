@@ -358,7 +358,7 @@ class InternalSubscription
 
       if recharge_customer and recharge_customer["customer"]
         puts recharge_customer
-        puts Colorize.red('stripe_customer delete')
+        puts Colorize.red('recharge_customer delete')
         url = URI("https://api.rechargeapps.com/customers/#{recharge_customer["customer"]["id"]}")
         recharge_http_request(url, "{\n\n}", "delete")
         # qw12
