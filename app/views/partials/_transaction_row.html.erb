@@ -15,20 +15,26 @@
     </li>
   </ul>
   <% unless transaction.status %>
-  <div class="errors-row clearfix">
-    <div class="errors-bar align-left">
-      <div class="errors-title">Error Code(s)</div>
-      <div class="errors-list">
-        <ul class="clearfix">
-          <% for error_code in transaction.error_codes %>
-          <li><%= error_code %></li>
-          <% end %>
-        </ul>
-      </div><!-- .errors-list -->
-    </div><!-- .errors-bar -->
-    <% unless transaction.no_retry %>
-      <!-- <button class="retry-single align-right">Retry</button> -->
+    <div class="errors-row clearfix">
+      <div class="errors-bar align-left">
+        <div class="errors-title">Error Code(s)</div>
+        <div class="errors-list">
+          <ul class="clearfix">
+            <% for error_code in transaction.error_codes %>
+            <li><%= error_code %></li>
+            <% end %>
+          </ul>
+        </div><!-- .errors-list -->
+      </div><!-- .errors-bar -->
+      <% unless transaction.no_retry or true %>
+        <button class="retry-single align-right">Retry</button>
+      <% end %>
+    </div><!-- .errors-row -->
+    <% unless transaction.stripe_token or true %>
+      <div class="errors-row clearfix input-fields">
+        <input type="text" placeholder="Credit Card #" name="card-number">
+        <input type="text" placeholder="Expiration (MM/YY)" name="card-expiration">
+      </div>
     <% end %>
-  </div><!-- .errors-row -->
   <% end %>
 </div><!-- .subs-row -->

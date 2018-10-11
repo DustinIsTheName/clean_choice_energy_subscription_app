@@ -21,19 +21,30 @@ class InternalSubscription
         # Create Stripe token and Customer - Stripe
         ################################################################################
         begin
-          expiration = row["Credit Card Expiration (MM/YY)"].split('/')
-          stripe_token = Stripe::Token.create(
-            :card => {
-              :number => row["Credit Card #"],
-              :exp_month => expiration[0],
-              :exp_year => expiration[1]
-            },
-          )
+          if row["stripe_token"]
+            stripe_customer = Stripe::Customer.retrieve(row["stripe_token"])
+          else
+            address2 = row["Street Address 2"] ||= ""
+            expiration = row["Credit Card Expiration (MM/YY)"].split('/')
+            stripe_token = Stripe::Token.create(
+              :card => {
+                :number => row["Credit Card #"],
+                :exp_month => expiration[0],
+                :exp_year => expiration[1],
+                :name => "#{row["First Name"]} #{row["Last Name"]}",
+                :address_line1 => row["Street Address"],
+                :address_line2 => address2,
+                :address_city => row["City"],
+                :address_state => row["State"],
+                :address_zip => row["Zip"]
+              },
+            )
 
-          stripe_customer = Stripe::Customer.create(
-            :description => "Customer: #{row["First Name"]} #{row["Last Name"]}",
-            :source => stripe_token
-          )
+            stripe_customer = Stripe::Customer.create(
+              :description => "Customer: #{row["First Name"]} #{row["Last Name"]}",
+              :source => stripe_token
+            )
+          end
         rescue => e
           error_codes << e.message
           puts Colorize.orange('Stripe Error - Token or Customer')
@@ -139,22 +150,34 @@ class InternalSubscription
         # Create Stripe token and Customer to pass to ReCharge - Stripe
         ################################################################################
         begin
-          if row["Credit Card Expiration (MM/YY)"]
-            expiration = row["Credit Card Expiration (MM/YY)"].split('/')
-            stripe_token = Stripe::Token.create(
-              :card => {
-                :number => row["Credit Card #"],
-                :exp_month => expiration[0],
-                :exp_year => expiration[1]
-              },
-            )
-
-            stripe_customer = Stripe::Customer.create(
-              :description => "Customer: #{row["First Name"]} #{row["Last Name"]}",
-              :source => stripe_token
-            )
+          if row["stripe_token"]
+            stripe_customer = Stripe::Customer.retrieve(row["stripe_token"])
           else
-            error_codes << "Credit Card Expiration can't be blank"
+            if row["Credit Card Expiration (MM/YY)"]
+              expiration = row["Credit Card Expiration (MM/YY)"].split('/')
+
+              stripe_token = Stripe::Token.create(
+                :card => {
+                  :number => row["Credit Card #"],
+                  :exp_month => expiration[0],
+                  :exp_year => expiration[1],
+                  :name => "#{row["First Name"]} #{row["Last Name"]}",
+                  :address_line1 => row["Street Address"],
+                  :address_line2 => address2,
+                  :address_city => row["City"],
+                  :address_state => row["State"],
+                  :address_zip => row["Zip"]
+                },
+              )
+
+              stripe_customer = Stripe::Customer.create(
+                :description => "Customer: #{row["First Name"]} #{row["Last Name"]}",
+                :source => stripe_token
+              )
+            
+            else
+              error_codes << "Credit Card Expiration can't be blank"
+            end
           end
         rescue => e
           error_codes << e.message
@@ -221,6 +244,7 @@ class InternalSubscription
       transaction.name = ''
       unless row["First Name"].blank?
         transaction.name = row["First Name"].strip
+        transaction.first_name = row["First Name"].strip
         subscription.first_name = row["First Name"].strip
       else
         error_codes << "First Name can't be blank"
@@ -230,10 +254,15 @@ class InternalSubscription
       end
       unless row["Last Name"].blank?
         transaction.name += row["Last Name"].strip
+        transaction.last_name = row["Last Name"].strip
         subscription.last_name = row["Last Name"].strip
       else
         error_codes << "Last Name can't be blank"
       end
+    end
+
+    if stripe_token
+      transaction.stripe_token = stripe_customer.id
     end
 
     ######### Email Field
@@ -292,6 +321,12 @@ class InternalSubscription
     ################################################################################
     # Organize Address Information - Subscription
     ################################################################################
+    transaction.street_address = row["Street Address"]
+    transaction.street_address_2 = row["Street Address 2"]
+    transaction.city = row["City"]
+    transaction.state = row["State"]
+    transaction.zip = row["Zip"]
+
     unless row["Street Address"].blank? or row["City"].blank? or row["State"].blank? or row["Zip"].blank?
       subscription.address = {
         street_address: row["Street Address"],
@@ -332,7 +367,7 @@ class InternalSubscription
       if stripe_customer
         puts stripe_customer
         puts Colorize.red('stripe_customer delete')
-        stripe_customer.delete
+        # stripe_customer.delete
       end
 
       puts Colorize.red('errors present, so skip saving subscription')

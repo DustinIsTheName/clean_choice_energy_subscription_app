@@ -188,6 +188,64 @@ class ProcessesController < ApplicationController
     render json: params
   end
 
+  def retry
+    puts Colorize.magenta(params)
+
+    Stripe.api_key = CURRENT_STRIPE_SECRET_KEY
+
+    import = Import.find(params[:import_id])
+    old_transaction = Transaction.find(params[:transaction_id])
+
+    row = {}
+
+    row["First Name"] = old_transaction.first_name
+    row["Last Name"] = old_transaction.last_name
+    row["Email"] = old_transaction.email
+    row["Street Address"] = old_transaction.street_address
+    row["Street Address 2"] = old_transaction.street_address_2
+    row["City"] = old_transaction.city
+    row["State"] = old_transaction.state
+    row["Zip"] = old_transaction.zip
+    row["Credit Card #"] = params["card_number"]
+    row["Credit Card Expiration (MM/YY)"] = params["card_expiration"]
+    row["Subscription Product"] = old_transaction.product
+    row["stripe_token"] = old_transaction.stripe_token
+
+    subscription = Subscription.find_by({first_name: row["First Name"]&.strip, last_name: row["Last Name"]&.strip, cc_number: row["Credit Card #"].to_s.strip.slice(-4,4)})
+
+    unless row["Subscription Product"].blank?
+      begin
+        product = ShopifyAPI::Product.find(row["Subscription Product"])
+      rescue => e
+        error_codes << 'Product not found'
+      end
+    end
+
+    transaction = InternalSubscription.create(row, import, subscription, product)
+
+    old_transaction.destroy
+
+    event_lines = [{
+      successful: transaction.status,
+      text: "##{transaction.id} - #{transaction.name} - #{transaction.email} - #{product&.title} - $#{product&.variants&.first&.price} - #{transaction.cc_number}"
+    }]
+
+    ################################################################################
+    # Create and save an Event for the Logs
+    ################################################################################
+    event = Event.new
+    event.name = "Retry: Batch # #{import.id}"
+    event.event_type = "retry"
+    event.event_lines = event_lines
+    event.user_id = current_user.id
+
+    event.save
+
+    render json: {
+      transaction: transaction
+    }
+  end
+
   def delete
     puts params
 

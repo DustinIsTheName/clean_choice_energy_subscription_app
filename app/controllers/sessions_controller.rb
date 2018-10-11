@@ -4,13 +4,14 @@ class SessionsController < Devise::SessionsController
     if current_user
       puts Colorize.blue("in user")
       import = current_user.import
-
-      if import
-        import.transactions.destroy_all
-        import.destroy
-      end
     end
 
     super
+
+    if import
+      puts Colorize.bright("delete import?")
+      import.transactions.destroy_all
+      import.destroy
+    end
   end
 end

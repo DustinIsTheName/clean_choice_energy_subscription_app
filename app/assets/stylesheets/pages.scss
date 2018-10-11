@@ -488,6 +488,18 @@ button.retry-all:hover,
 
 .errors-row {
   padding: 0 25px 25px;
+
+  &.input-fields {
+    display: flex;
+
+    input {
+      font-size: 15px;
+      padding: 5px 15px;
+      margin: -4px auto;
+      width: 45%;
+      display: inline-block;
+    }
+  }
 }
 .errors-bar {
   width: calc(100% - 123px);
@@ -519,6 +531,13 @@ button.retry-all:hover,
   font-size: 15px;
   padding: 9px;
   margin-right: 37px;
+
+  &.is-loading:before {
+    border-color: #D0021B;
+  }
+  &.is-loading:hover:before {
+    border-color: #fff;
+  }
 }
 
 /***** END IMPORT PAGE *****/
@@ -949,9 +968,9 @@ button.disabled, .btn.disabled {
   display: none;
 }
 
-.errors-bar {
-  width: 100%;
-}
+// .errors-bar {
+//   width: 100%;
+// }
 
 .subscriptions .errors-list ul {
   padding-right: 25px;

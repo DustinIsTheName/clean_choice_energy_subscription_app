@@ -5,6 +5,10 @@
 function ready() {
   var sim;
 
+  String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+  }
+
   function dashIfEmpty(value) {
     if (value) {
       return value;
@@ -111,12 +115,13 @@ function ready() {
         $('.importing-container .importing').text('Imported '+csv.transactions.length+' subscription orders');
         finishBar();
         console.log(csv);
-        var $emptyRow = $($('.import-page').data('empty-transaction-row'))
+        var $emptyRow = $($('.import-page').data('empty-transaction-row'));
 
         successful_transactions = csv.transactions.filter(t => t.status);
         failed_transactions = csv.transactions.filter(t => !t.status);
 
         $('.subs-row').remove();
+        $('.batch-number').text('Batch '+csv.id);
 
         if (failed_transactions.length) {
           $('.subs-failed').parent().show().prev().show();
@@ -155,6 +160,14 @@ function ready() {
             }
           });
 
+          if (row.stripe_token) {
+            $newRow.find('.errors-row.input-fields').remove();
+          }
+
+          // if (row.stripe_token) {
+          //   $newRow.attr('data-stripe-token', row.stripe_token);
+          // }
+
           $('.subscriptions.subs-failed').append($newRow);
         });
 
@@ -191,6 +204,129 @@ function ready() {
         });
       });
     }
+  });
+
+  $('body').on('click', '.retry-single', function(e) {
+    e.preventDefault();
+    $this = $(this);
+
+    $this.addClass('is-loading');
+    var transaction_id = $this.closest('.subs-row').find('.sub-number').text();
+    var import_id = $('.section-title.batch-number').text().replace('Batch ', '');
+
+    $.ajax({
+      type: "POST",
+      url: '/retry',
+      data: {
+        transaction_id: transaction_id,
+        import_id: import_id,
+        card_number: $('[name="card-number"]').val(),
+        card_expiration: $('[name="card-expiration"]').val()
+      }
+    }).success(function(retry) {
+      console.log(retry);
+      var $emptyRow = $($('.import-page').data('empty-transaction-row'));
+      $this.removeClass('is-loading');
+
+      if (retry.transaction.status) {
+        successful_transaction = retry.transaction
+      } else {
+        failed_transaction = retry.transaction
+      }
+
+      $('.subs-row').remove();
+
+      // if (failed_transactions.length) {
+      //   $('.subs-failed').parent().show().prev().show();
+
+      //   $('.transactions-failed .transaction-qty').text(failed_transactions.length + ' of ' + csv.transactions.length);
+      //   var failed_total = failed_transactions.map(function(t) {
+      //     return t.amount
+      //   }).reduce(add, 0);
+      //   // $('.transactions-failed .transaction-sales').text('$'+failed_total.toFixed(2));
+
+      //   $('.transactions-failed').show();
+      // } else {
+      //   $('.subs-failed').parent().hide().prev().hide();
+      //   $('.transactions-failed').hide();
+      // }
+
+      if (failed_transaction) {
+        var $newRow = $emptyRow.clone();
+
+        $newRow.find('.sub-number').text(dashIfEmpty(failed_transaction.id));
+        $newRow.find('.name').text(dashIfEmpty(failed_transaction.name));
+        $newRow.find('.email').text(dashIfEmpty(failed_transaction.email));
+        $newRow.find('.product').text(dashIfEmpty(failed_transaction.product));
+        if (failed_transaction.amount) {
+          $newRow.find('.amount').text('$' + failed_transaction.amount.toFixed(2));
+        } else {
+          $newRow.find('.amount').text('-');
+        }
+        $newRow.find('.cc_number').text(dashIfEmpty(failed_transaction.cc_number));
+        $newRow.find('.sub-status').text('Failed');
+
+        failed_transaction.error_codes.forEach(function(error_code) {
+          $newRow.find('.errors-list ul').append('<li>'+error_code+'</li>');
+          if (failed_transaction.no_retry) {
+            $newRow.find('.errors-row .retry-single').remove();
+          }
+        });
+
+        if (failed_transaction.stripe_token) {
+          $newRow.find('.errors-row.input-fields').remove();
+        }
+
+        // if (failed_transaction.stripe_token) {
+        //   $newRow.attr('data-stripe-token', failed_transaction.stripe_token);
+        // }
+
+        $('.subscriptions.subs-failed').append($newRow);
+      }
+
+      // if (successful_transactions.length) {
+      //   $('.subs-success').parent().show().prev().show();
+
+      //   $('.transactions-success .transaction-qty').text(successful_transactions.length + ' of ' + csv.transactions.length);
+      //   var success_total = successful_transactions.map(function(t) {
+      //     return t.amount
+      //   }).reduce(add, 0);
+      //   // $('.transactions-success .transaction-sales').text('$'+success_total.toFixed(2));
+
+      //   $('.transactions-success').show();
+      // } else {
+      //   $('.subs-success').parent().hide().prev().hide();
+      //   $('.transactions-success').hide();
+      // }
+
+      if (successful_transaction) {
+        var $newRow = $emptyRow.clone();
+
+        $newRow.find('.sub-number').text(successful_transaction.id);
+        $newRow.find('.name').text(successful_transaction.name);
+        $newRow.find('.email').text(dashIfEmpty(successful_transaction.email));
+        $newRow.find('.product').text(successful_transaction.product);
+        $newRow.find('.amount').text('$' + successful_transaction.amount.toFixed(2));
+        $newRow.find('.cc_number').text(successful_transaction.cc_number);
+        $newRow.find('.sub-status').text('Success');
+
+        $newRow.find('.errors-row').remove();
+
+        $('.subscriptions.subs-success').append($newRow);
+        $('.import-results-container').show();
+      }
+
+
+
+
+
+
+
+    });
+
+
+
+    console.log('retry-single');
   });
 
   $('.log-details .details').click(function() {
@@ -528,6 +664,8 @@ function ready() {
   $('#add-user').click(function() {
     var user = {}
 
+    $('.add-success').remove();
+
     $('#add-user').addClass('is-loading');
 
     $('.single-user-field').each(function() {
@@ -562,6 +700,9 @@ function ready() {
         console.log(user);
       } else {
 
+        $('.add-title').append('<span class="add-success" style="margin-left: 15px;color:#64A75A;text-transform: none;font-size: 14px;">Successfully added '+user.first_name+' '+user.last_name+'.</span>');
+        $('.single-user-field').val('');
+
         var $emptyRow = $($('.user-page').data('empty-user-row'));
         var $newRow = $emptyRow.clone();
 
@@ -569,7 +710,7 @@ function ready() {
         $newRow.find('.users-number').text(user.id);
         $newRow.find('.users-name').text(user.first_name + ' ' + user.last_name);
         $newRow.find('.users-email').text(user.email);
-        $newRow.find('.users-access').text(user.access);
+        $newRow.find('.users-access').text(user.access.split('_').map(function(a) {return a.capitalize();}).join(' '));
 
         console.log(user);
 
@@ -631,8 +772,6 @@ function ready() {
     $userRow.find('.users-access').addClass('edit').html(access_html);
   });
 
-
-
   $('body').on('click', '.button-user-edit-save', function(e) {
     e.preventDefault();
     var $userRow = $(this).closest('.users-row');
@@ -653,10 +792,6 @@ function ready() {
         }
       }).success(function(response) {
         console.log(response);
-
-        String.prototype.capitalize = function() {
-          return this.charAt(0).toUpperCase() + this.slice(1);
-        }
 
         $userRow.find('.button-user-edit-save').removeClass('is-loading').hide();
         $userRow.find('.button-user-delete').show();

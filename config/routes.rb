@@ -16,6 +16,7 @@ Rails.application.routes.draw do
     post 'import' => :import
     post 'single' => :single
     post 'edit' => :edit
+    post 'retry' => :retry
     post 'delete' => :delete
     post 'user' => :add_user
     post 'edit-user' => :edit_user
