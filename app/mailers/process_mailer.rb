@@ -10,7 +10,9 @@ class ProcessMailer < ApplicationMailer
     @product = ShopifyAPI::Product.find(subscription.product)
     @shop = ShopifyAPI::Shop.current
 
-    mail(to: 'dustin@wittycreative.com', from: 'cleanchoiceenergy@no-reply.com', subject: 'Subscription Canceled')
+    if @subscription.email
+      mail(to: @subscription.email, from: 'cleanchoiceenergy@no-reply.com', subject: 'Subscription Canceled')
+    end
 
   end
 
