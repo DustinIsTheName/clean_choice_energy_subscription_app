@@ -943,7 +943,10 @@ html {
   height: 100%;
 }
 body.devise-sessions-new,
-body.sessions-new {
+body.sessions-new,
+body.devise-passwords-new,
+body.devise-passwords-edit,
+body[class*="devise"] {
   height: 100%;
 }
 .notice,
