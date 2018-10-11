@@ -30,11 +30,13 @@
         <button class="retry-single align-right">Retry</button>
       <% end %>
     </div><!-- .errors-row -->
-    <% unless transaction.stripe_token or true %>
-      <div class="errors-row clearfix input-fields">
-        <input type="text" placeholder="Credit Card #" name="card-number">
-        <input type="text" placeholder="Expiration (MM/YY)" name="card-expiration">
-      </div>
+    <% if false %>
+      <% unless transaction.stripe_token or true %>
+        <div class="errors-row clearfix input-fields">
+          <input type="text" placeholder="Credit Card #" name="card-number">
+          <input type="text" placeholder="Expiration (MM/YY)" name="card-expiration">
+        </div>
+      <% end %>
     <% end %>
   <% end %>
 </div><!-- .subs-row -->
