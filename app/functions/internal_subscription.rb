@@ -80,6 +80,46 @@ class InternalSubscription
           puts e.message
         end
       else # row["Email"].blank?
+
+        ################################################################################
+        # Create Stripe token and Customer to pass to ReCharge - Stripe
+        ################################################################################
+        begin
+          if row["stripe_token"]
+            stripe_customer = Stripe::Customer.retrieve(row["stripe_token"])
+          else
+            if row["Credit Card Expiration (MM/YY)"]
+              expiration = row["Credit Card Expiration (MM/YY)"].split('/')
+
+              stripe_token = Stripe::Token.create(
+                :card => {
+                  :number => row["Credit Card #"],
+                  :exp_month => expiration[0],
+                  :exp_year => expiration[1],
+                  :name => "#{row["First Name"]} #{row["Last Name"]}",
+                  :address_line1 => row["Street Address"],
+                  :address_line2 => address2,
+                  :address_city => row["City"],
+                  :address_state => row["State"],
+                  :address_zip => row["Zip"]
+                },
+              )
+
+              stripe_customer = Stripe::Customer.create(
+                :description => "Customer: #{row["First Name"]} #{row["Last Name"]}",
+                :source => stripe_token
+              )
+            
+            else
+              error_codes << "Credit Card Expiration can't be blank"
+            end
+          end
+        rescue => e
+          error_codes << e.message
+          puts Colorize.orange('Stripe Error for ReCharge')
+          puts e.message
+        end
+
         ################################################################################
         # Create ReCharge Customer and Address. - ReCharge
         ################################################################################
@@ -101,7 +141,8 @@ class InternalSubscription
             "billing_city": row["City"],
             "billing_province": row["State"],
             "billing_country": "United States",
-            "billing_phone": "1-800-555-1234"
+            "billing_phone": "1-800-555-1234",
+            "stripe_customer_token": stripe_customer.id
           }
 
           recharge_customer = recharge_http_request(url, customer_params, 'post')
@@ -147,45 +188,6 @@ class InternalSubscription
         end
 
         ################################################################################
-        # Create Stripe token and Customer to pass to ReCharge - Stripe
-        ################################################################################
-        begin
-          if row["stripe_token"]
-            stripe_customer = Stripe::Customer.retrieve(row["stripe_token"])
-          else
-            if row["Credit Card Expiration (MM/YY)"]
-              expiration = row["Credit Card Expiration (MM/YY)"].split('/')
-
-              stripe_token = Stripe::Token.create(
-                :card => {
-                  :number => row["Credit Card #"],
-                  :exp_month => expiration[0],
-                  :exp_year => expiration[1],
-                  :name => "#{row["First Name"]} #{row["Last Name"]}",
-                  :address_line1 => row["Street Address"],
-                  :address_line2 => address2,
-                  :address_city => row["City"],
-                  :address_state => row["State"],
-                  :address_zip => row["Zip"]
-                },
-              )
-
-              stripe_customer = Stripe::Customer.create(
-                :description => "Customer: #{row["First Name"]} #{row["Last Name"]}",
-                :source => stripe_token
-              )
-            
-            else
-              error_codes << "Credit Card Expiration can't be blank"
-            end
-          end
-        rescue => e
-          error_codes << e.message
-          puts Colorize.orange('Stripe Error for ReCharge')
-          puts e.message
-        end
-
-        ################################################################################
         # Create ReCharge Subscription with created Customer and Address and Stripe token. - ReCharge
         ################################################################################
 
@@ -209,8 +211,7 @@ class InternalSubscription
               "order_interval_unit": "month",
               "order_interval_frequency": "1",
               "order_day_of_month": current_time.mday,
-              "charge_interval_frequency": "1",
-              "stripe_customer_token": stripe_customer.id
+              "charge_interval_frequency": "1"              
             }
 
             recharge_subscription = recharge_http_request(url, subscription_params, 'post')
