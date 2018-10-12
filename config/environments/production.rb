@@ -58,7 +58,7 @@ Rails.application.configure do
   # config.active_job.queue_name_prefix = "clean_choice_energy_subscription_app_#{Rails.env}"
   config.action_mailer.perform_caching = false
 
-  config.action_mailer.default_url_options = { host: 'https://cce-subscriptions.herokuapp.com', port: 3000 }
+  config.action_mailer.default_url_options = { host: 'https://cce-subscriptions.herokuapp.com', protocol: 'https' }
 
   config.action_mailer.asset_host = 'https://cce-subscriptions.herokuapp.com'
 
