@@ -10,11 +10,11 @@
 
     <%= f.password_field :password, autofocus: true, autocomplete: "new-password", placeholder: "New password" %>
     <% if @minimum_password_length %>
-      <em>(<%= @minimum_password_length %> characters minimum)</em><br />
+      <em>(<%= @minimum_password_length %> characters minimum)</em><br /><br />
     <% end %>
     <%= f.password_field :password_confirmation, autocomplete: "off", placeholder: "Confirm new password" %>
     
-    <%= f.button "Change my password", style: "margin-bottom: 0;" %>
+    <%= f.button "Change my password", style: "margin-bottom: 10px;" %>
     <%= render "devise/shared/links" %>
   <% end %>
 </div>
