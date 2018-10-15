@@ -38,7 +38,7 @@ class ProcessesController < ApplicationController
       transaction = InternalSubscription.create(row, import, subscription, product)
       event_lines << {
         successful: transaction.status,
-        text: "##{transaction.id} - #{transaction.name} - #{transaction.email} - #{product&.title} - $#{product&.variants&.first&.price} - #{transaction.cc_number}"
+        text: "##{transaction.subscription_id} - #{transaction.name} - #{transaction.email} - #{product&.title} - $#{product&.variants&.first&.price} - #{transaction.cc_number}"
       }
     end
 
@@ -84,7 +84,7 @@ class ProcessesController < ApplicationController
     transaction = InternalSubscription.create(row, import, subscription, product)
     event_lines = [{
       successful: transaction.status,
-      text: "##{transaction.id} - #{transaction.name} - #{transaction.email} - #{product&.title} - $#{product&.variants&.first&.price} - #{transaction.cc_number}"
+      text: "##{transaction.subscription_id} - #{transaction.name} - #{transaction.email} - #{product&.title} - $#{product&.variants&.first&.price} - #{transaction.cc_number}"
     }]
 
     ################################################################################
@@ -164,6 +164,7 @@ class ProcessesController < ApplicationController
 
     subscription.first_name = params["first_name"]
     subscription.last_name = params["last_name"]
+    subscription.full_name = "#{params["first_name"]} #{params["last_name"]}"
     subscription.email = params["email"]
 
     if subscription.save
@@ -227,7 +228,7 @@ class ProcessesController < ApplicationController
 
     event_lines = [{
       successful: transaction.status,
-      text: "##{transaction.id} - #{transaction.name} - #{transaction.email} - #{product&.title} - $#{product&.variants&.first&.price} - #{transaction.cc_number}"
+      text: "##{transaction.subscription_id} - #{transaction.name} - #{transaction.email} - #{product&.title} - $#{product&.variants&.first&.price} - #{transaction.cc_number}"
     }]
 
     ################################################################################

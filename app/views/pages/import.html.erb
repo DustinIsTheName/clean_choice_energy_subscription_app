@@ -71,7 +71,7 @@
               <% if successful_transactions %>
                 <%= successful_transactions.count %> of <%= @import.transaction_count %>
               <% end %>
-              </div>
+            </div>
             <div class="transaction-sales">
               <% if successful_transactions %>
                 <%= money successful_transactions.map{ |t| t.amount }.compact.sum %>

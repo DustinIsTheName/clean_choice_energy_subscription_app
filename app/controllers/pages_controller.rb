@@ -25,7 +25,10 @@ class PagesController < ApplicationController
 
     html_string = ''
 
+    puts Colorize.cyan(@subscriptions.length)
+
     for subscription in @subscriptions
+      puts Colorize.bright(subscription.attributes)
       html_string << render_to_string(partial: '/partials/subscription_row', locals: {subscription: subscription})
     end
 

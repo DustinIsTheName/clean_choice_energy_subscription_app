@@ -1,6 +1,6 @@
 <div class="subs-row clearfix">
   <ul class="clearfix">
-    <li class="sub-number"><%= transaction.id %></li>
+    <li class="sub-number"><%= dash_if_empty transaction.subscription_id %></li>
     <li class="name"><%= dash_if_empty transaction.name %></li>
     <li class="email"><%= dash_if_empty transaction.email %></li>
     <li class="product"><%= get_product_name transaction.product %></li>

@@ -142,7 +142,7 @@ function ready() {
         failed_transactions.forEach(function(row) {
           var $newRow = $emptyRow.clone();
 
-          $newRow.find('.sub-number').text(dashIfEmpty(row.id));
+          $newRow.find('.sub-number').text('-');
           $newRow.find('.name').text(dashIfEmpty(row.name));
           $newRow.find('.email').text(dashIfEmpty(row.email));
           $newRow.find('.product').text(dashIfEmpty(row.product));
@@ -191,7 +191,7 @@ function ready() {
         successful_transactions.forEach(function(row) {
           var $newRow = $emptyRow.clone();
 
-          $newRow.find('.sub-number').text(row.id);
+          $newRow.find('.sub-number').text(row.subscription_id);
           $newRow.find('.name').text(row.name);
           $newRow.find('.email').text(dashIfEmpty(row.email));
           $newRow.find('.product').text(row.product);
