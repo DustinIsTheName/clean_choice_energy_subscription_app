@@ -21,7 +21,7 @@ class PagesController < ApplicationController
 
   def subscription_page
     puts Colorize.magenta(params)
-    @subscriptions = Subscription.where("full_name like ?", "%#{params["search"]}%").order('created_at DESC').paginate(:page => params["page"])
+    @subscriptions = Subscription.where("lower(full_name) like ?", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
 
     html_string = ''
 
