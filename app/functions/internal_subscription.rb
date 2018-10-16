@@ -247,16 +247,19 @@ class InternalSubscription
         transaction.name = row["First Name"].strip
         transaction.first_name = row["First Name"].strip
         subscription.first_name = row["First Name"].strip
+        subscription.full_name = row["First Name"].strip
       else
         error_codes << "First Name can't be blank"
       end
       unless row["First Name"].blank? or row["Last Name"].blank?
         transaction.name += ' '
+        subscription.full_name += ' '
       end
       unless row["Last Name"].blank?
         transaction.name += row["Last Name"].strip
         transaction.last_name = row["Last Name"].strip
         subscription.last_name = row["Last Name"].strip
+        subscription.last_name += row["Last Name"].strip
       else
         error_codes << "Last Name can't be blank"
       end
