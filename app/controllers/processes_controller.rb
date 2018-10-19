@@ -1,6 +1,6 @@
 class ProcessesController < ApplicationController
 
-  skip_before_filter :verify_authenticity_token, :only => [:recharge_delete_subscription, :recharge_delete_customer, :stripe_delete]
+  skip_before_filter :verify_authenticity_token, :only => [:recharge_delete_subscription, :recharge_delete_customer, :stripe_delete, :stripe_failed]
 
   def import
     Stripe.api_key = CURRENT_STRIPE_SECRET_KEY
@@ -457,6 +457,12 @@ class ProcessesController < ApplicationController
     if subscription
       subscription.destroy
     end
+
+    head :ok, content_type: "text/html"
+  end
+
+  def stripe_failed
+    puts Colorize.cyan(params)
 
     head :ok, content_type: "text/html"
   end

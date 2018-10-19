@@ -24,6 +24,7 @@ Rails.application.routes.draw do
     post 'recharge-delete-subscription' => :recharge_delete_subscription
     post 'recharge-delete-customer' => :recharge_delete_customer
     post 'stripe-delete' => :stripe_delete
+    post 'stripe-failed' => :stripe_failed
   end
 
   match 'download', to: 'processes#download', as: 'download', via: :get
