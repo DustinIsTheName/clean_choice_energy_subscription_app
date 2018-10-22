@@ -1,4 +1,4 @@
-<div data-sub-id="<%= subscription.id %>" class="subs-row clearfix <% if subscription.email %>email<% else %>no-email<% end %>">
+<div data-sub-id="<%= subscription.id %>" class="subs-row clearfix <% if subscription.email.blank? %>no-email<% else %>email<% end %>">
   <ul>
     <li class="sub-number"><%= subscription.id %></li>
     <li class="name"><span class="first"><%= subscription.first_name %></span> <span class="last"><%= subscription.last_name %></span></li>

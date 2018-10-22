@@ -22,10 +22,10 @@ module ApplicationHelper
   end
 
   def dash_if_empty(content)
-    if content
-      content
-    else
+    if content.blank?
       "-"
+    else
+      content
     end
   end
 
