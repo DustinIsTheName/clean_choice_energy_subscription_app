@@ -8,7 +8,7 @@ class PagesController < ApplicationController
   def subscription
     puts Colorize.magenta(params)
     @subscriptions = Subscription.order('created_at DESC').paginate(:page => 1)
-    @successful_subscriptions = Subscription.where("fail_count == 0").order('created_at DESC').paginate(:page => 1)
+    @successful_subscriptions = Subscription.where("fail_count = 0").order('created_at DESC').paginate(:page => 1)
     @failed_subscriptions = Subscription.where("fail_count > 0").order('created_at DESC').paginate(:page => 1)
 
     puts @subscriptions.length
@@ -37,17 +37,17 @@ class PagesController < ApplicationController
     puts Colorize.magenta(params)
     if params["email"] == 'hide-no-email'
       @subscriptions = Subscription.where("lower(full_name) like ? AND (email IS NOT NULL AND trim(email) != '')", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
-      @successful_subscriptions = Subscription.where("lower(full_name) like ? AND (email IS NOT NULL AND trim(email) != '') AND fail_count == 0", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
+      @successful_subscriptions = Subscription.where("lower(full_name) like ? AND (email IS NOT NULL AND trim(email) != '') AND fail_count = 0", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
       @failed_subscriptions = Subscription.where("lower(full_name) like ? AND (email IS NOT NULL AND trim(email) != '') AND fail_count > 0", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
       puts Colorize.green('hide-no-email')
     elsif params["email"] == 'hide-email'
       @subscriptions = Subscription.where("lower(full_name) like ? AND (email IS NULL OR trim(email) == '')", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
-      @successful_subscriptions = Subscription.where("lower(full_name) like ? AND (email IS NULL OR trim(email) == '') AND fail_count == 0", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
+      @successful_subscriptions = Subscription.where("lower(full_name) like ? AND (email IS NULL OR trim(email) == '') AND fail_count = 0", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
       @failed_subscriptions = Subscription.where("lower(full_name) like ? AND (email IS NULL OR trim(email) == '') AND fail_count > 0", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
       puts Colorize.green('hide-email')
     else
       @subscriptions = Subscription.where("lower(full_name) like ?", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
-      @successful_subscriptions = Subscription.where("lower(full_name) like ? AND fail_count == 0", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
+      @successful_subscriptions = Subscription.where("lower(full_name) like ? AND fail_count = 0", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
       @failed_subscriptions = Subscription.where("lower(full_name) like ? AND fail_count > 0", "%#{params["search"]&.downcase}%").order('created_at DESC').paginate(:page => params["page"])
       puts Colorize.green('nothing about email')
     end
