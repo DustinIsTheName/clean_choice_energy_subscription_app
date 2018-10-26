@@ -303,9 +303,11 @@ class InternalSubscription
     if recharge_customer
       if recharge_customer["customer"]
         subscription.external_customer_id = recharge_customer["customer"]["id"]
+        subscription.stripe_customer_id = stripe_customer.id
       end
     elsif stripe_customer
       subscription.external_customer_id = stripe_customer.id
+      subscription.stripe_customer_id = stripe_customer.id
     end
 
     if stripe_subscription
@@ -321,6 +323,8 @@ class InternalSubscription
         end
       end
     end
+
+    subscription.fail_count = 0
 
     ################################################################################
     # Organize Address Information - Subscription

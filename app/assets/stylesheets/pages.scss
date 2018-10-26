@@ -592,7 +592,10 @@ button.retry-all:hover,
 .subscriptions-filter-bar {
   background: #283745;
   padding: 25px 0;
-  margin-bottom: 50px;
+
+  &~ .container {
+    margin-top: 50px;
+  }
 }
 .subscriptions-filter {}
 .subscriptions-filter-label {
@@ -1046,6 +1049,32 @@ button.details {
 
     &+ .single-subscription-field {
       margin-top: 10px;
+    }
+  }
+
+  .errors-row {
+    padding: 0 25px 25px;
+
+    .errors-bar {
+
+      &.has-error-message {
+        .errors-title {
+          border-radius: 4px 0 0 4px;
+        }
+        
+        .errors-list {
+          display: block;
+        }
+      }
+
+      .errors-title {
+        border-radius: 4px;
+      }
+
+      .errors-list {
+        padding: 11px 0 11px 25px;
+        display: none;
+      }
     }
   }
 }

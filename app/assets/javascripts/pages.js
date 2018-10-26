@@ -411,8 +411,52 @@ function ready() {
     $('.email-filter li').removeClass('active');
     $(this).addClass('active');
 
-    $('.subscriptions').removeClass('hide-email hide-no-email');
-    $('.subscriptions').addClass(filter);
+    page = 1;
+
+    $.ajax({
+      type: "GET",
+      url: '/subscription_page',
+      data: {
+        page: page,
+        search: search,
+        email: $('.email-filter .active').data('filter')
+      }
+    }).success(function(pagination) {
+      console.log(pagination);
+      $('.search').removeClass('is-loading').addClass('reset');
+      $('.subscriptions .subs-row').remove();
+      if (pagination.html) {
+        if (pagination.successful_html) {
+          $('.successful-subscriptions .subscriptions').append(pagination.successful_html);
+          $('.successful-subscriptions').show();
+        } else {
+          $('.successful-subscriptions').hide();
+        }
+
+        if (pagination.failed_html) {
+          $('.failed-subscriptions .subscriptions').append(pagination.failed_html);
+          $('.failed-subscriptions').show();
+        } else {
+          $('.failed-subscriptions').hide();
+        }
+      } else {
+        $('.successful-subscriptions').show();
+        $('.failed-subscriptions').hide();
+        $('.subscriptions').append('<div class="subs-row clearfix" style="padding: 21px 20px 19px;text-align: center;">No results for "'+search+'".</div>');
+      }
+
+      if (pagination.successful_load_more) {
+        $('.successful-subscriptions .load-more').show();
+      } else {
+        $('.successful-subscriptions .load-more').hide();
+      }
+
+      if (pagination.failed_load_more) {
+        $('.failed-subscriptions .load-more').show();
+      } else {
+        $('.failed-subscriptions .load-more').hide();
+      }
+    });
   });
 
   $('#add-single-subscription').click(function() {
@@ -558,28 +602,39 @@ function ready() {
   var search = '';
 
   $('body').on('click', '.load-more', function(e) {
-    if (!$('.load-more').hasClass('is-loading')) {
-      $('.load-more').addClass('is-loading');
-      page++;
+    var $loadMore = $(this);
+    var html;
+    var load_more;
 
-      console.log(search);
+    if ($loadMore.parent().hasClass('successful-subscriptions')) {
+      html = 'successful_html';
+      load_more = 'successful_load_more'
+    } else if ($loadMore.parent().hasClass('failed-subscriptions')) {
+      html = 'failed_html';
+      load_more = 'failed_load_more';
+    }
+
+    if (!$loadMore.hasClass('is-loading')) {
+      $loadMore.addClass('is-loading');
+      page++;
 
       $.ajax({
         type: "GET",
         url: '/subscription_page',
         data: {
           page: page,
-          search: search
+          search: search,
+          email: $('.email-filter .active').data('filter')
         }
       }).success(function(pagination) {
         console.log(pagination);
-        $('.load-more').removeClass('is-loading');
-        $('.subscriptions').append(pagination.html);
+        $loadMore.removeClass('is-loading');
+        $loadMore.prev().append(pagination[html]);
 
-        if (pagination.load_more) {
-          $('.load-more').show();
+        if (pagination[load_more]) {
+          $loadMore.show();
         } else {
-          $('.load-more').hide();
+          $loadMore.hide();
         }
       });
     }
@@ -606,22 +661,44 @@ function ready() {
           url: '/subscription_page',
           data: {
             page: page,
-            search: search
+            search: search,
+            email: $('.email-filter .active').data('filter')
           }
         }).success(function(pagination) {
           console.log(pagination);
           $('.search').removeClass('is-loading').addClass('reset');
           $('.subscriptions .subs-row').remove();
           if (pagination.html) {
-            $('.subscriptions').append(pagination.html);
+            if (pagination.successful_html) {
+              $('.successful-subscriptions .subscriptions').append(pagination.successful_html);
+              $('.successful-subscriptions').show();
+            } else {
+              $('.successful-subscriptions').hide();
+            }
+
+            if (pagination.failed_html) {
+              $('.failed-subscriptions .subscriptions').append(pagination.failed_html);
+              $('.failed-subscriptions').show();
+            } else {
+              $('.failed-subscriptions').hide();
+            }
+
           } else {
+            $('.successful-subscriptions').show();
+            $('.failed-subscriptions').hide();
             $('.subscriptions').append('<div class="subs-row clearfix" style="padding: 21px 20px 19px;text-align: center;">No results for "'+search+'".</div>');
           }
 
-          if (pagination.load_more) {
-            $('.load-more').show();
+          if (pagination.successful_load_more) {
+            $('.successful-subscriptions .load-more').show();
           } else {
-            $('.load-more').hide();
+            $('.successful-subscriptions .load-more').hide();
+          }
+
+          if (pagination.failed_load_more) {
+            $('.failed-subscriptions .load-more').show();
+          } else {
+            $('.failed-subscriptions .load-more').hide();
           }
         });
       } else {
@@ -635,22 +712,41 @@ function ready() {
           url: '/subscription_page',
           data: {
             page: page,
-            search: search
+            search: search,
+            email: $('.email-filter .active').data('filter')
           }
         }).success(function(pagination) {
           console.log(pagination);
           $('.search').removeClass('is-loading').removeClass('reset');
           $('.subscriptions .subs-row').remove();
           if (pagination.html) {
-            $('.subscriptions').append(pagination.html);
+            if (pagination.successful_html) {
+              $('.successful-subscriptions .subscriptions').append(pagination.successful_html);
+              $('.successful-subscriptions').show();
+            } else {
+              $('.successful-subscriptions').hide();
+            }
+
+            if (pagination.failed_html) {
+              $('.failed-subscriptions .subscriptions').append(pagination.failed_html);
+              $('.failed-subscriptions').show();
+            } else {
+              $('.failed-subscriptions').hide();
+            }
           } else {
             $('.subscriptions').append('<div class="subs-row clearfix" style="padding: 21px 20px 19px;text-align: center;">No results for "'+search+'".</div>');
           }
 
-          if (pagination.load_more) {
-            $('.load-more').show();
+          if (pagination.successful_load_more) {
+            $('.successful-subscriptions .load-more').show();
           } else {
-            $('.load-more').hide();
+            $('.successful-subscriptions .load-more').hide();
+          }
+
+          if (pagination.failed_load_more) {
+            $('.failed-subscriptions .load-more').show();
+          } else {
+            $('.failed-subscriptions .load-more').hide();
           }
         });
       }

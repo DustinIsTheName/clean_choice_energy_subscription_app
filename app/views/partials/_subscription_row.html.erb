@@ -19,4 +19,12 @@
       </a>
     </li><!-- .edit-delete -->
   </ul>
+  <% if subscription.fail_count and subscription.fail_count > 0 %>
+    <div class="errors-row clearfix">
+      <div class="errors-bar align-left<% if subscription.fail_message %> has-error-message<% end %>">
+        <div class="errors-title">Failed <%= subscription.fail_count %> times.</div>
+        <div class="errors-list"><%= subscription.fail_message %></div>
+      </div>
+    </div>
+  <% end %>
 </div><!-- .subs-row -->

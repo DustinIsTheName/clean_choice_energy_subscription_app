@@ -109,7 +109,10 @@
           </div><!-- .subscriptions-filter -->
         </div><!-- .container -->
       </div><!-- .subscriptions-filter-bar -->
-      <div class="container">
+
+
+      <div class="container failed-subscriptions"<% if @failed_subscriptions.length == 0 %> style="display:none;"<% end %>>
+        <div class="section-title batch-number">Failed Subscriptions</div>
         <div class="subscriptions clearfix">
           <div class="subs-header clearfix">
             <ul>
@@ -123,15 +126,42 @@
               <li></li>
             </ul>
           </div><!-- .subs-header -->
-          <% for subscription in @subscriptions %>
+          <% for subscription in @failed_subscriptions %>
             <%= render partial: '/partials/subscription_row', locals: {subscription: subscription} %>
           <% end %>
           
         </div><!-- subscriptions -->
-        <% if @load_more %>
+        <% if @failed_load_more %>
           <button class="load-more">Load more</button>
         <% end %>
       </div><!-- .container -->
+
+      <div class="container successful-subscriptions"<% if @successful_subscriptions.length == 0 %> style="display:none;"<% end %>>
+        <div class="section-title batch-number">Successful Subscriptions</div>
+        <div class="subscriptions clearfix">
+          <div class="subs-header clearfix">
+            <ul>
+              <li class="sub-number">#</li>
+              <li class="name">Name</li>
+              <li class="email">Email</li>
+              <li class="product">Product</li>
+              <li class="amount">Amount</li>
+              <li class="cc_number">CC #</li>
+              <li class="sub-date">Enroll Date</li>
+              <li></li>
+            </ul>
+          </div><!-- .subs-header -->
+          <% for subscription in @successful_subscriptions %>
+            <%= render partial: '/partials/subscription_row', locals: {subscription: subscription} %>
+          <% end %>
+          
+        </div><!-- subscriptions -->
+        <% if @successful_load_more %>
+          <button class="load-more">Load more</button>
+        <% end %>
+      </div><!-- .container -->
+
+
     </div><!-- .page-content -->
   <% else %>
 

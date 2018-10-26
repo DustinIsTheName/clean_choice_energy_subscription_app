@@ -44,11 +44,15 @@
                   <%= event.event_lines.first[:text] %>
                 <% elsif event.event_type == 'update' %>
                   <%= event.event_lines.first[:text] %>
+                <% elsif event.event_type == 'retry_transaction' %>
+                  <%= event.event_lines.first[:text] %>
+                <% elsif event.event_type == 'failed' %>
+                  <%= event.event_lines.first[:text] %>
                 <% else %>
                 <%= event.event_lines.count %> total: <span class="log-fail"><%= failed_lines.count %> failed</span> / <span class="log-success"><%= successful_lines.count %> successful</span>
                 <% end %>
               </div><!-- .log-description-text -->
-              <% unless event.name.downcase.include? 'cancel' %>
+              <% unless event.name.downcase.include? 'cancel' or event.event_type == 'failed' or event.event_type == 'retry_transaction' %>
                 <button class="details align-right">Show Details</button>
               <% end %>
             </div><!-- .log-description -->
@@ -82,188 +86,7 @@
         </div><!-- .log-row -->
 
       <% end %>
-
-
-
-
-      <% if false %>
-      <div class="log-date section-title-small">9/2/18</div>
-      <div class="log-row clearfix">
-        <div class="log-time align-left">5:47pm EST</div>
-        <div class="log-details align-right">
-          <div class="log-label align-left clearfix">
-            <div class="log-label-text align-left">Retry: Batch #419</div>
-            <div class="log-user align-right">Susan Smith</div>
-          </div><!-- .log-label -->
-          <div class="log-description align-left">
-            <div class="log-description-text align-left">
-              5 total: <span class="log-fail">1 failed</span> / <span class="log-success">4 successful</span>
-            </div><!-- .log-description-text -->
-            <button class="details align-right">Show Details</button>
-          </div><!-- .log-description -->
-        </div><!-- .log-details -->
-      </div><!-- .log-row -->
-      <div class="log-row clearfix">
-        <div class="log-time align-left">5:47pm EST</div>
-        <div class="log-details align-right">
-          <div class="log-label align-left clearfix">
-            <div class="log-label-text align-left">Update</div>
-            <div class="log-user align-right">Susan Smith</div>
-          </div><!-- .log-label -->
-          <div class="log-description align-left">
-            <div class="log-description-text align-left">
-              Subscription #923 was updated
-            </div><!-- .log-description-text -->
-            <button class="details align-right">Show Details</button>
-          </div><!-- .log-description -->
-        </div><!-- .log-details -->
-      </div><!-- .log-row -->
-      <div class="log-row clearfix">
-        <div class="log-time align-left">5:47pm EST</div>
-        <div class="log-details align-right">
-          <div class="log-label align-left clearfix">
-            <div class="log-label-text align-left">Cancel</div>
-            <div class="log-user align-right">Susan Smith</div>
-          </div><!-- .log-label -->
-          <div class="log-description align-left">
-            <div class="log-description-text align-left">
-              Subscription #721 was cancelled
-            </div><!-- .log-description-text -->
-          </div><!-- .log-description -->
-        </div><!-- .log-details -->
-      </div><!-- .log-row -->
-      <div class="log-row clearfix">
-        <div class="log-time align-left">5:47pm EST</div>
-        <div class="log-details align-right">
-          <div class="log-label align-left clearfix">
-            <div class="log-label-text align-left">Manual: Batch #418</div>
-            <div class="log-user align-right">Susan Smith</div>
-          </div><!-- .log-label -->
-          <div class="log-description align-left">
-            <div class="log-description-text align-left">
-              <span class="log-success">1 successful</span>
-            </div><!-- .log-description-text -->
-            <button class="details align-right">Show Details</button>
-          </div><!-- .log-description -->
-        </div><!-- .log-details -->
-      </div><!-- .log-row -->
-      <div class="log-row showing-details clearfix">
-        <div class="log-time align-left">5:47pm EST</div>
-        <div class="log-details align-right">
-          <div class="log-label align-left clearfix">
-            <div class="log-label-text align-left">Import: Batch #417</div>
-            <div class="log-user align-right">Susan Smith</div>
-          </div><!-- .log-label -->
-          <div class="log-description align-left">
-            <div class="log-description-text align-left">
-              17 total: <span class="log-fail">5 failed</span> / <span class="log-success">12 successful</span>
-            </div><!-- .log-description-text -->
-            <button class="details align-right">Hide Details</button>
-          </div><!-- .log-description -->
-          <div class="log-accordion-details align-left">
-            <div class="log-accordion-title-failed">Failed: 5 of 17</div>
-            <ul>
-              <li>#5 - John Doe - test@example.com - NREC - $19.00 - 8208</li>
-              <li>#8 - John Doe - no email - NREC - $19.00 - 8208</li>
-            </ul>
-            <div class="log-accordion-title-success">Successful: 12 of 17</div>
-            <ul>
-              <li>#1 - John Doe - test@example.com - NREC - $19.00 - 8208</li>
-              <li>#2 - John Doe - no email - NREC - $19.00 - 8208</li>
-            </ul>
-          </div><!-- .log-accordion-details -->
-        </div><!-- .log-details -->
-      </div><!-- .log-row -->
-      <% end %>
-
-
-
     </div><!-- .log-container -->
-
-
-
-
-    <% if false %>
-    <div class="log-container clearfix">
-      <div class="log-date section-title-small">9/1/18</div>
-      <div class="log-row clearfix">
-        <div class="log-time align-left">5:47pm EST</div>
-        <div class="log-details align-right">
-          <div class="log-label align-left clearfix">
-            <div class="log-label-text align-left">Retry: Batch #419</div>
-            <div class="log-user align-right">Susan Smith</div>
-          </div><!-- .log-label -->
-          <div class="log-description align-left">
-            <div class="log-description-text align-left">
-              5 total: <span class="log-fail">1 failed</span> / <span class="log-success">4 successful</span>
-            </div><!-- .log-description-text -->
-            <button class="details align-right">Show Details</button>
-          </div><!-- .log-description -->
-        </div><!-- .log-details -->
-      </div><!-- .log-row -->
-      <div class="log-row clearfix">
-        <div class="log-time align-left">5:47pm EST</div>
-        <div class="log-details align-right">
-          <div class="log-label align-left clearfix">
-            <div class="log-label-text align-left">Update</div>
-            <div class="log-user align-right">Susan Smith</div>
-          </div><!-- .log-label -->
-          <div class="log-description align-left">
-            <div class="log-description-text align-left">
-              Subscription #923 was updated
-            </div><!-- .log-description-text -->
-            <button class="details align-right">Show Details</button>
-          </div><!-- .log-description -->
-        </div><!-- .log-details -->
-      </div><!-- .log-row -->
-      <div class="log-row clearfix">
-        <div class="log-time align-left">5:47pm EST</div>
-        <div class="log-details align-right">
-          <div class="log-label align-left clearfix">
-            <div class="log-label-text align-left">Cancel</div>
-            <div class="log-user align-right">Susan Smith</div>
-          </div><!-- .log-label -->
-          <div class="log-description align-left">
-            <div class="log-description-text align-left">
-              Subscription #721 was cancelled
-            </div><!-- .log-description-text -->
-          </div><!-- .log-description -->
-        </div><!-- .log-details -->
-      </div><!-- .log-row -->
-      <div class="log-row clearfix">
-        <div class="log-time align-left">5:47pm EST</div>
-        <div class="log-details align-right">
-          <div class="log-label align-left clearfix">
-            <div class="log-label-text align-left">Manual: Batch #418</div>
-            <div class="log-user align-right">Susan Smith</div>
-          </div><!-- .log-label -->
-          <div class="log-description align-left">
-            <div class="log-description-text align-left">
-              <span class="log-success">1 successful</span>
-            </div><!-- .log-description-text -->
-            <button class="details align-right">Show Details</button>
-          </div><!-- .log-description -->
-        </div><!-- .log-details -->
-      </div><!-- .log-row -->
-      <div class="log-row clearfix">
-        <div class="log-time align-left">5:47pm EST</div>
-        <div class="log-details align-right">
-          <div class="log-label align-left clearfix">
-            <div class="log-label-text align-left">Import: Batch #417</div>
-            <div class="log-user align-right">Susan Smith</div>
-          </div><!-- .log-label -->
-          <div class="log-description align-left">
-            <div class="log-description-text align-left">
-              17 total: <span class="log-fail">5 failed</span> / <span class="log-success">12 successful</span>
-            </div><!-- .log-description-text -->
-            <button class="details align-right">Show Details</button>
-          </div><!-- .log-description -->
-        </div><!-- .log-details -->
-      </div><!-- .log-row -->
-    </div><!-- .log-container -->
-    <% end %>
-
-
 
   </div><!-- .container -->
 </div><!-- .page-content -->
