@@ -99,7 +99,7 @@ class PagesController < ApplicationController
   end
 
   def log
-    @events = Event.all.reverse
+    @events = Event.all.order('created_at DESC')
   end
 
   def users
