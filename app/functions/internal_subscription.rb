@@ -265,7 +265,7 @@ class InternalSubscription
       end
     end
 
-    if stripe_token
+    if stripe_token and stripe_customer
       transaction.stripe_token = stripe_customer.id
     end
 
