@@ -1051,7 +1051,9 @@ button.details {
       margin-top: 10px;
     }
   }
+}
 
+.pages-subscription .subscription-page {
   .errors-row {
     padding: 0 25px 25px;
 
@@ -1071,7 +1073,7 @@ button.details {
         border-radius: 4px;
       }
 
-      .errors-list {
+      div.errors-list {
         padding: 11px 0 11px 25px;
         display: none;
       }

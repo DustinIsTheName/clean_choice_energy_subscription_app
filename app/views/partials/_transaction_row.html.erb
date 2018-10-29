@@ -1,4 +1,4 @@
-<div class="subs-row clearfix">
+<div class="subs-row clearfix" transaction_id="<%= transaction.id %>">
   <ul class="clearfix">
     <li class="sub-number"><%= dash_if_empty transaction.subscription_id %></li>
     <li class="name"><%= dash_if_empty transaction.name %></li>
@@ -16,7 +16,7 @@
   </ul>
   <% unless transaction.status %>
     <div class="errors-row clearfix">
-      <div class="errors-bar align-left">
+      <div class="errors-bar align-left has-error-message">
         <div class="errors-title">Error Code(s)</div>
         <div class="errors-list">
           <ul class="clearfix">

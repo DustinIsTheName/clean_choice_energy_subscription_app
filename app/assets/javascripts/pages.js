@@ -142,6 +142,8 @@ function ready() {
         failed_transactions.forEach(function(row) {
           var $newRow = $emptyRow.clone();
 
+          $newRow.attr('transaction_id', row.id);
+
           $newRow.find('.sub-number').text('-');
           $newRow.find('.name').text(dashIfEmpty(row.name));
           $newRow.find('.email').text(dashIfEmpty(row.email));
@@ -191,6 +193,8 @@ function ready() {
         successful_transactions.forEach(function(row) {
           var $newRow = $emptyRow.clone();
 
+          $newRow.attr('transaction_id', row.id);
+
           $newRow.find('.sub-number').text(row.subscription_id);
           $newRow.find('.name').text(row.name);
           $newRow.find('.email').text(dashIfEmpty(row.email));
@@ -213,7 +217,7 @@ function ready() {
     $this = $(this);
 
     $this.addClass('is-loading');
-    var transaction_id = $this.closest('.subs-row').find('.sub-number').text();
+    var transaction_id = $this.closest('.subs-row').attr('transaction_id');
     var import_id = $('.section-title.batch-number').text().replace('Batch ', '');
 
     $.ajax({
@@ -243,7 +247,9 @@ function ready() {
       if (failed_transaction) {
         var $newRow = $emptyRow.clone();
 
-        $newRow.find('.sub-number').text(dashIfEmpty(failed_transaction.id));
+        $newRow.attr('transaction_id', failed_transaction.id);
+
+        $newRow.find('.sub-number').text(dashIfEmpty(failed_transaction.transaction_id));
         $newRow.find('.name').text(dashIfEmpty(failed_transaction.name));
         $newRow.find('.email').text(dashIfEmpty(failed_transaction.email));
         $newRow.find('.product').text(dashIfEmpty(failed_transaction.product));
@@ -285,7 +291,9 @@ function ready() {
       if (successful_transaction) {
         var $newRow = $emptyRow.clone();
 
-        $newRow.find('.sub-number').text(successful_transaction.id);
+        $newRow.attr('transaction_id', successful_transaction.id);
+
+        $newRow.find('.sub-number').text(successful_transaction.subscription_id);
         $newRow.find('.name').text(successful_transaction.name);
         $newRow.find('.email').text(dashIfEmpty(successful_transaction.email));
         $newRow.find('.product').text(successful_transaction.product);
