@@ -101,16 +101,37 @@
 </style>
 
 <div class="certificate-container">
-    <img src="https://cce-subscriptions.herokuapp.com/circle-lines.png" alt="CleanChoice Energy" class="circle-lines">
+    <%= image_tag(
+      embed_remote_image(
+        'https://subscriptions.cleanchoiceenergy.com/circle-lines.png',
+        'image/jpeg'
+      ), 
+      alt: "CleanChoice Energy",
+      class: "circle-lines"
+    ) %>
     <div class="text1">This certificate</div>
     <div class="text2">is proudly presented to</div>
     <div class="text3"><%= properties["RecipientFirstName"] %> <%= properties["RecipientLastName"] %></div>
     <div class="text4">A $<%= @line_item["price"] %> gift of carbon offsets that supports the protection and sustainable care</div>
     <div class="text5">of <%= pluralize(acre_total, 'acre') %> in Appalachia has been made in your name.</div>
-    <img src="https://cce-subscriptions.herokuapp.com/cce-logo.png" alt="CleanChoice Energy" class="cce-logo">
+    <%= image_tag(
+      embed_remote_image(
+        'https://cce-subscriptions.herokuapp.com/cce-logo.png',
+        'image/jpeg'
+      ), 
+      alt: "CleanChoice Energy",
+      class: "cce-logo"
+    ) %>
     <div class="bottom-columns">
         <div class="signature-container">
-            <img src="https://cce-subscriptions.herokuapp.com/signature.jpg" alt="Tom Matzzie" class="tom-signature">
+            <%= image_tag(
+              embed_remote_image(
+                'https://cce-subscriptions.herokuapp.com/signature.jpg',
+                'image/jpeg'
+              ), 
+              alt: "Tom Matzzie",
+              class: "tom-signature"
+            ) %>
             <div class="text6">Tom Matzzie, Founder & CEO, CleanChoice Energy</div>
         </div><!-- .signature-container -->
         <div class="date-container">
