@@ -4,6 +4,11 @@ Rails.application.routes.draw do
 
   root to: "pages#import"
 
+  controller :gifts do
+    post 'gift-email' => :gift_email
+    get 'view-pdf' => :view_pdf
+  end
+
   controller :pages do
     get 'import' => :import
     get 'subscriptions' => :subscription

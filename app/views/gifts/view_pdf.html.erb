@@ -1,0 +1,121 @@
+<link href="https://fonts.googleapis.com/css?family=Lato|Libre+Baskerville" rel="stylesheet">
+
+<% properties = {} %>
+<% acre_total = @line_item["variant_title"].strip.slice(0).to_i %>
+<% for property in @line_item["properties"] %>
+  <% properties[property["name"]] = property["value"] %>
+<% end %>
+
+<style>
+    .certificate-container {
+        width: 792px;
+        height: 612px;
+        background: url('/assets/border.png') center center no-repeat;
+        background-size: auto 100%;
+        text-align: center;
+        color: #0093D7;
+        font-family: 'Libre Baskerville', serif;
+    }
+    .circle-lines {
+        width: 185px;
+        top: 130px;
+        position: relative;
+    }
+    .text1 {
+        text-transform: uppercase;
+        font-weight: bold;
+        font-size: 13px;
+        /*letter-spacing: 2px;*/
+        text-align: center;
+        width: 100%;
+        top: 147px;
+        position: relative;
+    }
+    .text2 {
+        font-style: italic;
+        font-size: 13px;
+        top: 163px;
+        position: relative;
+    }
+    .text3 {
+        text-transform: uppercase;
+        font-size: 29px;
+        top: 195px;
+        position: relative;
+    }
+    .text4 {
+        font-style: italic;
+        font-size: 13px;
+        top: 207px;
+        position: relative;
+    }
+    .text5 {
+        font-style: italic;
+        font-size: 13px;
+        top: 212px;
+        position: relative;
+    }
+    .cce-logo {
+        width: 163px;
+        top: 238px;
+        position: relative;
+    }
+    .bottom-columns {
+        font-family: 'Lato', sans-serif;
+        width: 537px;
+        height: 54px;
+        margin: 0 auto;
+        top: 244px;
+        position: relative;
+    }
+    .signature-container {
+        width: 187px;
+        float: left;
+    }
+    .tom-signature {
+        width: 129px;
+    }
+    .text6 {
+        border-top: #0093D7 solid 1px;
+        font-size: 8px;
+        width: 100%;
+        padding-top: 3px;
+    }
+    .date-container {
+        width: 187px;
+        position: absolute;
+        bottom: 1px;
+        right: 0;
+    }
+    .text7 {
+        color: #231F20;
+        font-size: 8px;
+        margin-bottom: 10px;
+    }
+    .text8 {
+        border-top: #0093D7 solid 1px;
+        font-size: 8px;
+        width: 100%;
+        padding-top: 3px;
+    }
+</style>
+
+<div class="certificate-container">
+    <%= image_tag "circle-lines.png", alt: "CleanChoice Energy", class: "circle-lines" %>
+    <div class="text1">This certificate</div>
+    <div class="text2">is proudly presented to</div>
+    <div class="text3"><%= properties["RecipientFirstName"] %> <%= properties["RecipientLastName"] %></div>
+    <div class="text4">A $<%= @line_item["price"] %> gift of carbon offsets that supports the protection and sustainable care</div>
+    <div class="text5">of <%= pluralize(acre_total, 'acre') %> in Appalachia has been made in your name.</div>
+    <%= image_tag "cce-logo.png", alt: "CleanChoice Energy", class: "cce-logo" %>
+    <div class="bottom-columns">
+        <div class="signature-container">
+            <%= image_tag "signature.jpg", alt: "CleanChoice Energy", class: "tom-signature" %>
+            <div class="text6">Tom Matzzie, Founder & CEO, CleanChoice Energy</div>
+        </div><!-- .signature-container -->
+        <div class="date-container">
+            <div class="text7"><%= Time.now.strftime('%B %-d, %Y') %></div>
+            <div class="text8">Date</div>
+        </div><!-- .date-container -->
+    </div><!-- .bottom-columns -->
+</div><!-- .certificate-container -->

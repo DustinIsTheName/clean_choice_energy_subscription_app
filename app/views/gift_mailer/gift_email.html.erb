@@ -1,0 +1,44 @@
+<link href="https://fonts.googleapis.com/css?family=Libre+Baskerville" rel="stylesheet">
+
+<style>/* Delete <style> when complete */
+    .email-container {
+        border: #000 solid 1px; 
+    }
+</style>
+
+<% properties = {} %>
+<% acre_total = @line_item["variant_title"].strip.slice(0).to_i %>
+<% for property in @line_item["properties"] %>
+  <% properties[property["name"]] = property["value"] %>
+<% end %>
+
+<table class="email-container" style="width: 600px; height: 792px; text-align: center; color: #231F20; font-family: 'Lato', sans-serif;">
+    <tr>
+        <td style="height: 124px;">
+          <%= image_tag "circle-tree.png", alt: "CleanChoice Energy", class: "circle-tree", style: "width: 124px; height: 124px; padding: 70px 0 0;" %>
+        </td>
+    </tr>
+    <tr>
+        <td style="height: 40px;"><div style="color: #4DAA50; font-size: 43px; font-weight: 900; padding: 0;" class="text1">A gift for you</div></td>
+    </tr>
+    <tr>
+        <td style="height: 22px;"><div style="color: #4DAA50; font-size: 18px; font-weight: 900; text-transform: uppercase; padding: 5px 0 0;" class="text2">FROM <%= properties["Gifter Name"] %></div></td>
+    </tr>
+    <tr>
+        <td style="height: 88px;"><div style="font-size: 18px; font-weight: 900; width: 292px; margin: 0 auto; padding: 35px 0 0;" class="text3">A $<%= @line_item["price"] %> gift to support the protection and sustainable care of forests in Appalachia has been made in your name, <%= properties["RecipientFirstName"] %>.</div></td>
+    </tr>
+    <tr>
+        <td style="height: 125px;"><div style="font-size: 14px; line-height: 25px; width: 348px; margin: 0 auto; padding: 25px 0 0;" class="text4">In a region that has seen millions of acres destroyed by coal mining and excessive logging, this gift supports the care of trees covering <%= pluralize(acre_total, 'acre') %> — and includes an offset of <%= pluralize(acre_total, 'ton') %> of carbon pollution. It helps to heal our planet and move us toward a cleaner, greener future.</div></td>
+    </tr>
+    <tr>
+        <td style="height: 17px;"><div style="font-size: 14px; padding: 25px 0 15px;" class="text5">Happy Holidays!</div></td>
+    </tr>
+    <tr>
+        <td style="height: 63px;">
+          <%= image_tag "cce-logo-black.png", alt: "CleanChoice Energy", class: "cce-logo-black", style: "width: 98px; padding: 20px 0 10px;" %>
+        </td>
+    </tr>
+    <tr>
+        <td style="height: 24px;"><div style="font-size: 10px; padding: 0 0 70px;" class="text6">CleanChoice Energy also supplies 100% clean energy to homes and businesses.<br/>Visit cleanchoiceenergy.com or call 1-800-253-0468 to learn more.</div></td>
+    </tr>
+</table><!-- .email-container -->
