@@ -101,16 +101,16 @@
 </style>
 
 <div class="certificate-container">
-    <%= image_tag "circle-lines.png", alt: "CleanChoice Energy", class: "circle-lines" %>
+    <%= wicked_pdf_image_tag "circle-lines.png", alt: "CleanChoice Energy", class: "circle-lines" %>
     <div class="text1">This certificate</div>
     <div class="text2">is proudly presented to</div>
     <div class="text3"><%= properties["RecipientFirstName"] %> <%= properties["RecipientLastName"] %></div>
     <div class="text4">A $<%= @line_item["price"] %> gift of carbon offsets that supports the protection and sustainable care</div>
     <div class="text5">of <%= pluralize(acre_total, 'acre') %> in Appalachia has been made in your name.</div>
-    <%= image_tag "cce-logo.png", alt: "CleanChoice Energy", class: "cce-logo" %>
+    <%= wicked_pdf_image_tag "cce-logo.png", alt: "CleanChoice Energy", class: "cce-logo" %>
     <div class="bottom-columns">
         <div class="signature-container">
-            <%= image_tag "signature.jpg", alt: "CleanChoice Energy", class: "tom-signature" %>
+            <%= wicked_pdf_image_tag "signature.jpg", alt: "CleanChoice Energy", class: "tom-signature" %>
             <div class="text6">Tom Matzzie, Founder & CEO, CleanChoice Energy</div>
         </div><!-- .signature-container -->
         <div class="date-container">
