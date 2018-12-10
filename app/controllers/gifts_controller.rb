@@ -7,7 +7,7 @@ class GiftsController < ApplicationController
     puts Colorize.magenta(params)
 
     for item in params["line_items"]
-      GiftEmail.order_created(item)
+      GiftEmail.delay.order_created(item)
     end
 
     head :ok

@@ -11,10 +11,10 @@ class GiftMailer < ApplicationMailer
     attachments['gift_certificate.pdf'] = WickedPdf.new.pdf_from_string(
       render_to_string('gifts/view_pdf.html.erb'),
       orientation: 'Landscape',
-      dpi: 600
+      zoom: 9.0
     )
 
-    mail(to: 'dustin@wittycreative.com', from: 'cleanchoiceenergy@no-reply.com', subject: 'A gift for you')
+    mail(to: @line_item["properties"].select{|p| p["name"] == "RecipientEmail"}.first["value"], from: 'cleanchoiceenergy@no-reply.com', subject: 'A gift for you')
 
   end
 
