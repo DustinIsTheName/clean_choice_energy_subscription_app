@@ -9,7 +9,7 @@ class GiftMailer < ApplicationMailer
     @line_item = line_item
 
     if Rails.env.production?
-      zoom = 1
+      zoom = 1.6
     else
       zoom = 9.0
     end
