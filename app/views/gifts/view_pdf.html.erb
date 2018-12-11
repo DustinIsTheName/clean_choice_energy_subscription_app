@@ -7,15 +7,32 @@
 <% end %>
 
 <style>
+    .gifts-view_pdf {
+        padding: 0;
+    }
+
     .certificate-container {
-        width: 792px;
-        height: 612px;
+        /*width: 792px;
+        height: 612px;*/
+        position: relative;
+        width: 100%;
+        padding-bottom: 74%;
+        height: 0;
         background: url('<%= embed_remote_image('https://subscriptions.cleanchoiceenergy.com/border.png', 'image/jpeg')%>') center center no-repeat;
         background-size: 113%;
         text-align: center;
         color: #0093D7;
-        font-family: 'Libre Baskerville', 'Times New Roman' serif;
+        font-family: 'Libre Baskerville', 'Times New Roman', serif;
     }
+
+    .certificate-container-inner {
+        position: absolute;
+        top: calc(50% - 303.5px);
+        left: 0;
+        right: 0;
+        margin: auto;
+    }
+
     .circle-lines {
         width: 185px;
         top: 130px;
@@ -101,6 +118,7 @@
 </style>
 
 <div class="certificate-container">
+  <div class="certificate-container-inner">
     <%= image_tag(
       embed_remote_image(
         'https://subscriptions.cleanchoiceenergy.com/circle-lines.png',
@@ -139,4 +157,5 @@
             <div class="text8">Date</div>
         </div><!-- .date-container -->
     </div><!-- .bottom-columns -->
+  </div>
 </div><!-- .certificate-container -->
