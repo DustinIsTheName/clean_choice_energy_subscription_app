@@ -14,7 +14,7 @@
         background-size: 113%;
         text-align: center;
         color: #0093D7;
-        font-family: 'Libre Baskerville', serif;
+        font-family: 'Libre Baskerville', 'Times New Roman' serif;
     }
     .circle-lines {
         width: 185px;
@@ -77,7 +77,7 @@
     }
     .text6 {
         border-top: #0093D7 solid 1px;
-        font-size: 8px;
+        font-size: 7px;
         width: 100%;
         padding-top: 3px;
     }
@@ -135,7 +135,7 @@
             <div class="text6">Tom Matzzie, Founder & CEO, CleanChoice Energy</div>
         </div><!-- .signature-container -->
         <div class="date-container">
-            <div class="text7"><%= Time.now.strftime('%B %-d, %Y') %></div>
+            <div class="text7"><%= Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%B %-d, %Y') %></div>
             <div class="text8">Date</div>
         </div><!-- .date-container -->
     </div><!-- .bottom-columns -->
