@@ -7,12 +7,17 @@ class Webhooks
 
     for hook in webhooks["webhooks"]
 
-      url = URI("https://api.rechargeapps.com/webhooks/#{hook["id"]}")
+      if hook["topic"] == "customer/deactivated"
 
-      deleted_hook = recharge_http_request(url, "{\n\n}", 'delete')
+        url = URI("https://api.rechargeapps.com/webhooks/#{hook["id"]}")
 
-      print Colorize.red('Deleted webhook: ')
-      puts Colorize.red(deleted_hook)
+        deleted_hook = recharge_http_request(url, "{\n\n}", 'delete')
+
+        print Colorize.red('Deleted webhook: ')
+        print Colorize.red("customer/deactivated ")
+        puts Colorize.red(deleted_hook)
+
+      end
 
     end
 
@@ -21,7 +26,7 @@ class Webhooks
     # if ENV["HEROKU_ENV"] == 'production'
     #   webhook_body = {"address": "https://cce-subscriptions.herokuapp.com/recharge-delete-subscription", "topic": "subscription/cancelled"}
     # else
-    #   webhook_body = {"address": "https://ebf05f17.ngrok.io/recharge-delete-subscription", "topic": "subscription/cancelled"}
+    #   webhook_body = {"address": "https://7a95ed18.ngrok.io/recharge-delete-subscription", "topic": "subscription/cancelled"}
     # end
 
     # webhook = recharge_http_request(url, webhook_body, 'post')
@@ -32,7 +37,53 @@ class Webhooks
     if ENV["HEROKU_ENV"] == 'production'
       webhook_body = {"address": "https://cce-subscriptions.herokuapp.com/recharge-delete-customer", "topic": "customer/deactivated"}
     else
-      webhook_body = {"address": "https://ebf05f17.ngrok.io/recharge-delete-customer", "topic": "customer/deactivated"}
+      webhook_body = {"address": "https://7a95ed18.ngrok.io/recharge-delete-customer", "topic": "customer/deactivated"}
+    end
+
+    webhook = recharge_http_request(url, webhook_body, 'post')
+
+    print Colorize.green('Created webhook: ')
+    puts Colorize.green(webhook)
+  end
+
+  def self.create_recharge_subscription
+    url = URI("https://api.rechargeapps.com/webhooks")
+
+    webhooks = recharge_http_request(url, nil, 'get')
+
+    for hook in webhooks["webhooks"]
+
+      if hook["topic"] == "subscription/created"
+
+        url = URI("https://api.rechargeapps.com/webhooks/#{hook["id"]}")
+
+        deleted_hook = recharge_http_request(url, "{\n\n}", 'delete')
+
+        print Colorize.red('Deleted webhook: ')
+        print Colorize.red("subscription/created ")
+        puts Colorize.red(deleted_hook)
+
+      end
+
+    end
+
+    url = URI("https://api.rechargeapps.com/webhooks")
+
+    # if ENV["HEROKU_ENV"] == 'production'
+    #   webhook_body = {"address": "https://cce-subscriptions.herokuapp.com/recharge-delete-subscription", "topic": "subscription/cancelled"}
+    # else
+    #   webhook_body = {"address": "https://7a95ed18.ngrok.io/recharge-delete-subscription", "topic": "subscription/cancelled"}
+    # end
+
+    # webhook = recharge_http_request(url, webhook_body, 'post')
+
+    # print Colorize.green('Created webhook: ')
+    # puts Colorize.green(webhook)
+
+    if ENV["HEROKU_ENV"] == 'production'
+      webhook_body = {"address": "https://cce-subscriptions.herokuapp.com/single-from-online-store", "topic": "subscription/created"}
+    else
+      webhook_body = {"address": "https://7a95ed18.ngrok.io/single-from-online-store", "topic": "subscription/created"}
     end
 
     webhook = recharge_http_request(url, webhook_body, 'post')

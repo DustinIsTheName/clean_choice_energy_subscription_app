@@ -362,6 +362,8 @@ class InternalSubscription
     # Check Error Codes
     ################################################################################
     if error_codes.size > 0
+      puts Colorize.red(error_codes)
+
       transaction.status = false
 
       if recharge_customer and recharge_customer["customer"]

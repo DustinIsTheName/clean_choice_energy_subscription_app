@@ -1,6 +1,6 @@
 class ProcessesController < ApplicationController
 
-  skip_before_filter :verify_authenticity_token, :only => [:recharge_delete_subscription, :recharge_delete_customer, :stripe_delete, :stripe_failed]
+  skip_before_filter :verify_authenticity_token, :only => [:recharge_delete_subscription, :recharge_delete_customer, :stripe_delete, :stripe_failed, :single_from_online_store]
 
   def import
     Stripe.api_key = CURRENT_STRIPE_SECRET_KEY
@@ -99,6 +99,77 @@ class ProcessesController < ApplicationController
     event.save
 
     render json: import, :include => [:transactions]
+  end
+
+  def single_from_online_store
+    puts Colorize.magenta(params)
+
+    Stripe.api_key = CURRENT_STRIPE_SECRET_KEY
+
+    row = {}
+
+    url = URI("https://api.rechargeapps.com/customers/#{params["subscription"]["customer_id"]}")
+
+    customer = recharge_http_request url
+
+    import = Import.new
+    import.transaction_count = 1
+    import.save
+
+    subscription = Subscription.find_by({first_name: customer["customer"]["first_name"], last_name: customer["customer"]["last_name"], cc_number: "Shopify Order"})
+
+    begin
+      product = ShopifyAPI::Product.find(params["subscription"]["shopify_product_id"])
+    rescue => e
+      error_codes << 'Product not found'
+    end
+
+    unless subscription
+        
+      subscription = Subscription.new 
+
+      ################################################################################
+      # ReCharge
+      ################################################################################
+      subscription.first_name = customer["customer"]["first_name"]
+      subscription.last_name = customer["customer"]["last_name"]
+      subscription.email = customer["customer"]["email"]
+      subscription.address = {
+        street_address: customer["customer"]["billing_address1"],
+        street_address_2: customer["customer"]["billing_address2"],
+        city: customer["customer"]["billing_city"],
+        state: customer["customer"]["billing_province"],
+        zip: customer["customer"]["billing_zip"]
+      }
+      subscription.cc_number = "Shopify Order"
+      subscription.external_id = params["subscription"]["id"]
+      subscription.product = params["subscription"]["shopify_product_id"]
+      subscription.payment_service = 'recharge'
+      subscription.external_customer_id = customer["customer"]["id"]
+      subscription.amount = params["subscription"]["price"]
+      subscription.full_name = "#{customer["customer"]["first_name"]} #{customer["customer"]["last_name"]}"
+      subscription.stripe_customer_id = nil
+      subscription.fail_count = 0
+
+      subscription.save
+
+      event_lines = [{
+        successful: true,
+        text: "##{subscription.id} - #{subscription.full_name} - #{subscription.email} - #{product&.title} - $#{product&.variants&.first&.price} - Order from Store"
+      }]
+
+      ################################################################################
+      # Create and save an Event for the Logs
+      ################################################################################
+      event = Event.new
+      event.name = "Import: Batch # #{import.id}"
+      event.event_type = "import"
+      event.event_lines = event_lines
+
+      event.save
+    end
+
+    head :ok
   end
 
   def edit

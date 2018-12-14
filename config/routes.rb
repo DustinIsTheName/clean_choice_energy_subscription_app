@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   controller :processes do
     post 'import' => :import
     post 'single' => :single
+    post 'single-from-online-store' => :single_from_online_store
     post 'edit' => :edit
     post 'retry' => :retry
     post 'delete' => :delete
