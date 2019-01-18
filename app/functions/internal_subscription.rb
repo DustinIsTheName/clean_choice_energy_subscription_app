@@ -435,6 +435,58 @@ class InternalSubscription
     end
   end
 
+  def self.stripe_failed_function(params)
+
+    subscription = Subscription.find_by_stripe_customer_id(params["data"]["object"]["source"]["customer"])
+
+    if params["type"].include? "failed"
+
+      event = Event.new
+      if subscription.fail_count > 0
+        event.name = "Retry Transaction"
+        event.event_type = "retry_transaction"
+        event.event_lines = [{
+          successful: true,
+          text: "Subscription # #{subscription.id} retried and failed."
+        }]
+      else
+        event.name = "Failed Transaction"
+        event.event_type = "failed"
+        event.event_lines = [{
+          successful: true,
+          text: "Subscription # #{subscription.id} failed."
+        }]
+      end
+      event.save
+
+      subscription.fail_count += 1
+      subscription.fail_message = params["data"]["object"]["failure_message"]
+      subscription.save
+
+      # qw12
+
+    elsif params["type"].include? "succeeded"
+
+      if subscription.fail_count > 0
+        subscription.fail_count = 0
+        subscription.fail_message = ""
+        subscription.save
+
+        event = Event.new
+        event.name = "Retry Transaction"
+        event.event_type = "retry_transaction"
+        event.event_lines = [{
+          successful: true,
+          text: "Subscription # #{subscription.id} retried and succeeded."
+        }]
+
+        event.save
+      end
+
+    end
+
+  end
+
   private
 
     def self.recharge_http_request(url, body = nil, type = nil)
