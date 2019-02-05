@@ -44,7 +44,7 @@ Rails.application.configure do
 
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 
-  config.action_mailer.asset_host = 'https://6dc35912.ngrok.io'
+  config.action_mailer.asset_host = 'https://8d1db7e1.ngrok.io'
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

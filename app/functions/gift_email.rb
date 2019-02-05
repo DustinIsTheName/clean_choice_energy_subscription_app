@@ -4,7 +4,12 @@ class GiftEmail
     puts "order_created"
 
     if line_item["properties"].select{|p| p["name"] == "RecipientEmail"}.size > 0
-      GiftMailer.gift_email(line_item).deliver
+
+      if line_item["title"].downcase.include? "valentine"
+        GiftMailer.valentine_gift_email(line_item).deliver
+      else
+        GiftMailer.gift_email(line_item).deliver
+      end
     end
   end
 
