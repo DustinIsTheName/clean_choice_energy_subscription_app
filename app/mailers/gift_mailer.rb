@@ -54,7 +54,7 @@ class GiftMailer < ApplicationMailer
       }
     )
 
-    mail(to: @line_item["properties"].select{|p| p["name"] == "RecipientEmail"}.first["value"], from: 'cleanchoiceenergy@no-reply.com', subject: 'A gift for you')
+    mail(to: @line_item["properties"].select{|p| p["name"] == "RecipientEmail"}.first["value"], from: 'support@cleanchoiceenergy.com', subject: 'A gift for you')
 
   end
 
