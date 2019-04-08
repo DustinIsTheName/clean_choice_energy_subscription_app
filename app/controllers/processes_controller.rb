@@ -118,6 +118,10 @@ class ProcessesController < ApplicationController
 
     subscription = Subscription.find_by({first_name: customer["customer"]["first_name"], last_name: customer["customer"]["last_name"], cc_number: "Shopify Order"})
 
+    unless subscription
+      subscription = Subscription.where("first_name = ? and last_name = ? and address like ?", customer["customer"]["first_name"], customer["customer"]["last_name"], "%#{customer["customer"]["billing_address1"]}%#{customer["customer"]["billing_city"]}%").first
+    end
+
     begin
       product = ShopifyAPI::Product.find(params["subscription"]["shopify_product_id"])
     rescue => e
