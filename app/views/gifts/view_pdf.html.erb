@@ -159,8 +159,14 @@
     <div class="text1">This certificate</div>
     <div class="text2">is proudly presented to</div>
     <div class="text3"><%= first_name %> <%= last_name %></div>
-    <div class="text4">A $<%= @line_item["price"] %> gift of carbon offsets that supports the protection and sustainable care</div>
-    <div class="text5">of <%= pluralize(acre_total, 'acre') %> in Appalachia has been made in your name.</div>
+
+    <% if @first_name %>
+      <div class="text4">For sending a $<%= @line_item["price"] %> gift of carbon offsets that supports</div>
+      <div class="text5">the protection and sustainable care of <%= pluralize(acre_total, 'acre') %> in Appalachia.</div>
+    <% else %>
+      <div class="text4">A $<%= @line_item["price"] %> gift of carbon offsets that supports the protection and sustainable care</div>
+      <div class="text5">of <%= pluralize(acre_total, 'acre') %> in Appalachia has been made in your name.</div>
+    <% end %>
     <%= image_tag(
       embed_remote_image(
         'https://cce-subscriptions.herokuapp.com/cce-logo.png',
