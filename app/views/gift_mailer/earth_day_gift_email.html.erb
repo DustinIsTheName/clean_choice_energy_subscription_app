@@ -4,6 +4,17 @@
     .email-container {
         border: #000 solid 1px; 
     }
+
+    @media (max-width: 767px) {
+      table[class*="email-container"] {
+        width: 100% !important;
+        padding: 0 25px;
+      }
+
+      table[class*="email-container"] div {
+        width: 100% !important;
+      }
+    }
 </style>
 
 <% properties = {} %>
