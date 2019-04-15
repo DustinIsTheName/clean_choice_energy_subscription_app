@@ -6,7 +6,7 @@
     <li class="product"><%= get_product_name subscription.product %></li>
     <li class="amount"><%= dash_if_empty money subscription.amount %></li>
     <li class="cc_number"><% unless subscription.cc_number == "Shopify Order" %>-<% end %><%= subscription.cc_number %></li>
-    <li class="sub-date"><%= subscription.created_at&.in_time_zone("Eastern Time (US & Canada)")&.strftime('%-m/%-d/%y, %l:%M%P') %></li>
+    <li class="sub-date"><%= subscription.created_at&.in_time_zone("Eastern Time (US & Canada)")&.strftime('%-m/%-d/%y, %l:%M:%S%P') %></li>
     <li class="edit-delete">
       <a href="" class="button-edit" title="Edit">
         <%= image_tag("edit.png") %>
